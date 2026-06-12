@@ -8,7 +8,7 @@ Platform rekomendasi bacaan berbasis **Artificial Intelligence** yang membantu p
 
 ---
 
-## 👥 Tim Pengembang — Kelompok 5 Kelas C
+## 👥 Tim Pengembang — Kelompok Ayam Geprek Kelas C
 
 | Nama | NIM |
 |------|-----|
@@ -21,7 +21,7 @@ Platform rekomendasi bacaan berbasis **Artificial Intelligence** yang membantu p
 
 ## 🎯 Tentang Proyek
 
-Book Diary menganalisis kompleksitas linguistik buku yang telah dibaca pengguna, lalu merekomendasikan buku berikutnya dengan tingkat kesulitan yang **sedikit lebih tinggi** — tidak terlalu mudah, tidak terlalu sulit — sehingga kemampuan literasi meningkat secara bertahap dan terukur.
+Book Diary menganalisis kompleksitas linguistik buku yang telah dibaca pengguna, lalu merekomendasikan buku berikutnya dengan tingkat kesulitan yang **sedikit lebih tinggi**, sehingga kemampuan literasi meningkat secara bertahap dan terukur.
 
 ### Fitur Utama
 
@@ -71,9 +71,8 @@ book-diary/
 ├── step3_train_recommender.py    # Training model rekomendasi
 ├── step4_api.py                  # Flask REST API server
 │
-├── scraper_gramedia.py           # Scraper buku Gramedia (Selenium + requests)
-├── scraper_goodreads.py          # Scraper buku Goodreads (requests)
-├── merge_scraped.py              # Gabungkan hasil scraping ke dataset utama
+├── scraper.py                    # Scraper buku Gramedia (Selenium + requests)
+├── cleaning.py                   # Membersihkan data
 │
 ├── run_all.py                    # Jalankan step 1–3 sekaligus
 ├── requirements.txt              # Daftar dependensi Python
@@ -191,7 +190,7 @@ Content-Type: application/json
 | NLTK | Tokenisasi + stopwords |
 | textstat | Readability scoring |
 | pandas + numpy | Manipulasi data |
-| Selenium + BeautifulSoup | Web scraping |
+| Selenium | Web scraping |
 
 ### Frontend
 | Teknologi | Fungsi |
@@ -211,8 +210,7 @@ Content-Type: application/json
 | Sumber | Jumlah | Bahasa | Keterangan |
 |--------|--------|--------|------------|
 | CMU Book Summary Dataset | ~16.000 buku | Inggris | Download otomatis |
-| Gramedia Scraper | ~1.000 buku | Indonesia | Scraping lokal |
-| Kurasi Manual | 18 buku | Indonesia | Fallback jika scraping gagal |
+| Gramedia Scraper | ~700 buku | Indonesia | Scraping lokal |
 
 ---
 
@@ -281,5 +279,5 @@ Program Studi Informatika, Universitas Diponegoro, 2026.
 ---
 
 <p align="center">
-  Made with ♥ by Kelompok 5 Kelas C · Informatika UNDIP 2026
+  Made with ♥ by Kelompok Ayam Geprek Kelas C · Informatika UNDIP 2026
 </p>
