@@ -548,12 +548,16 @@ if __name__ == "__main__":
         print("\n[INFO] Server berjalan tanpa model.")
         print("       Jalankan step1-3 terlebih dahulu, lalu restart.")
     else:
-        print(f"[OK] API siap di http://localhost:{PORT}")
+        print(f"[OK] API siap")
         print("\nEndpoint tersedia:")
-        print(f"  GET  http://localhost:{PORT}/api/health")
-        print(f"  GET  http://localhost:{PORT}/api/books/search?q=laskar")
-        print(f"  GET  http://localhost:{PORT}/api/books/1")
-        print(f"  POST http://localhost:{PORT}/api/recommend")
-        print(f"  POST http://localhost:{PORT}/api/roadmap")
+        print(f"  GET  /api/health")
+        print(f"  GET  /api/books/search?q=laskar")
+        print(f"  GET  /api/books/1")
+        print(f"  POST /api/recommend")
+        print(f"  POST /api/roadmap")
 
-    app.run(host="0.0.0.0", port=PORT, debug=DEBUG)
+    # Railway menyediakan PORT via environment variable
+    # Locally tetap pakai 5000
+    import os
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port, debug=False)
