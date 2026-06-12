@@ -542,8 +542,37 @@ footer {
 .footer-credit { font-size:.75rem; color:var(--fog-lt); text-align:right; }
 .footer-heart { color:var(--rose); }
 
-/* ── TOAST ── */
-#toast {
+/* ── RESPONSIVE MOBILE ── */
+@media (max-width: 600px) {
+  header {
+    padding:0 1rem;
+    height:auto;
+    min-height:56px;
+    flex-wrap:wrap;
+    gap:.3rem;
+    padding-top:.5rem;
+    padding-bottom:.5rem;
+  }
+  .logo { font-size:1.1rem; }
+  nav {
+    width:100%;
+    justify-content:space-between;
+    padding-bottom:.4rem;
+  }
+  nav button {
+    font-size:.68rem;
+    padding:.35rem .5rem;
+    letter-spacing:.02em;
+  }
+  main { padding:1.2rem 1rem 4rem; }
+  .hero { padding:2rem .5rem 1.5rem; }
+  .hero h1 { font-size:1.9rem; }
+  .stat-grid { grid-template-columns:1fr 1fr; }
+  .rm-layout { grid-template-columns:1fr; }
+  .profil-two-col { grid-template-columns:1fr; }
+  #map-wrap { height:380px; }
+  .footer-inner { grid-template-columns:1fr; }
+}
   position:fixed; bottom:1.8rem; left:50%;
   transform:translateX(-50%) translateY(16px);
   background:var(--ink); color:var(--white);
@@ -799,7 +828,7 @@ footer {
     <span class="footer-copy">© 2026 Book Diary. All rights reserved.</span>
     <span class="footer-credit">
       Dibuat dengan <span class="footer-heart">♥</span> oleh
-      Kelompok Ayam Geprek Kelas C · Mata Kuliah AI · Informatika UNDIP 2026
+      Kelompok 5 Kelas C · Mata Kuliah AI · Informatika UNDIP 2026
     </span>
   </div>
 </footer>
