@@ -1,0 +1,1577 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Book Diary — Leveling Up Your Reading Journey</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --ink:#3d2535; --paper:#fff8fa; --cream:#fdeef3;
+  --rose:#e8799a; --rose-lt:#f0a0b8; --rose-dk:#c45c7a;
+  --blush:#fce4ec; --blush-lt:#fff0f4;
+  --teal:#4a8c7e; --teal-lt:#5eaa9a;
+  --fog:#9e8590; --fog-lt:#d9c4cb; --white:#fffbfd;
+  --r-sm:6px; --r-md:12px; --r-lg:20px;
+  --shadow-sm:0 1px 4px rgba(61,37,53,.08);
+  --shadow-md:0 4px 16px rgba(61,37,53,.10);
+  --shadow-lg:0 12px 40px rgba(61,37,53,.14);
+  --ease:cubic-bezier(.4,0,.2,1);
+  --amber:var(--rose); --amber-lt:var(--rose-lt);
+  --moss:var(--teal); --moss-lt:var(--teal-lt);
+}
+html { scroll-behavior:smooth; }
+body {
+  font-family:'DM Sans',sans-serif;
+  background:var(--paper); color:var(--ink);
+  min-height:100vh; overflow-x:hidden;
+}
+/* Ganti semua Instrument Serif → Playfair Display */
+.logo, .section-title, .hero h1,
+.card-title, .modal-title, .detail-book-title,
+.md-title, .lib-title, .profil-name,
+.stat-val, .lc-score, .mn-title,
+.level-big { font-family:'Playfair Display',serif !important; }
+body::before {
+  content:''; position:fixed; inset:0; pointer-events:none; z-index:9999;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.035'/%3E%3C/svg%3E");
+}
+
+/* ── HEADER ── */
+header {
+  background:var(--blush); color:var(--ink);
+  padding:0 2rem; display:flex; align-items:center; justify-content:space-between;
+  height:60px; position:sticky; top:0; z-index:100;
+  box-shadow:0 1px 0 rgba(228,121,154,.25), var(--shadow-sm);
+  border-bottom:1px solid rgba(232,121,154,.2);
+}
+.logo {
+  font-family:'Instrument Serif',serif; font-size:1.3rem;
+  display:flex; align-items:center; gap:.5rem; cursor:pointer;
+}
+.logo-dot { width:8px; height:8px; border-radius:50%; background:var(--rose); }
+nav { display:flex; gap:.25rem; }
+nav button {
+  background:none; border:none; color:var(--fog);
+  font-family:'DM Sans',sans-serif; font-size:.82rem; font-weight:500;
+  padding:.45rem .85rem; border-radius:var(--r-sm); cursor:pointer;
+  transition:all .2s; letter-spacing:.04em; text-transform:uppercase;
+}
+nav button:hover { background:rgba(232,121,154,.15); color:var(--ink); }
+nav button.active { background:var(--rose); color:var(--white); }
+
+/* ── PAGES ── */
+main { max-width:1160px; margin:0 auto; padding:2rem 1.5rem 5rem; }
+.page { display:none; }
+.page.active { display:block; animation:fadeUp .3s var(--ease); }
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(10px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+/* ── SECTION TITLE ── */
+.section-title {
+  font-family:'Playfair Display',serif; font-size:1.7rem; font-weight:400;
+  margin-bottom:1.4rem; line-height:1.2;
+}
+.section-title span { color:var(--rose); font-style:italic; }
+
+/* ── HERO ── */
+.hero { text-align:center; padding:3.5rem 1rem 2.5rem; }
+.hero-eyebrow {
+  font-size:.72rem; letter-spacing:.2em; text-transform:uppercase;
+  color:var(--rose); font-weight:500; margin-bottom:.9rem;
+}
+.hero h1 {
+  font-family:'Playfair Display',serif;
+  font-size:clamp(2rem,5vw,3.4rem); font-weight:400; line-height:1.1;
+  margin-bottom:.9rem;
+}
+.hero h1 em { color:var(--rose); font-style:italic; }
+.hero p {
+  color:var(--fog); font-size:1rem; max-width:500px;
+  margin:0 auto 2rem; line-height:1.75;
+}
+
+/* ── BADGE LEVEL ── */
+.badge-level {
+  display:inline-flex; align-items:center; gap:.55rem;
+  background:var(--cream); border:1px solid var(--fog-lt);
+  border-radius:999px; padding:.45rem 1.1rem;
+  font-size:.83rem; font-weight:500; margin-bottom:1.8rem;
+}
+.badge-level .lbl { color:var(--fog); font-size:.75rem; }
+
+/* ── SEARCH WRAP ── */
+.search-wrap { position:relative; max-width:500px; margin:0 auto .8rem; }
+.search-wrap input {
+  width:100%; background:var(--white); border:1.5px solid var(--fog-lt);
+  border-radius:var(--r-lg); padding:.8rem 3rem .8rem 1.1rem;
+  font-family:'DM Sans',sans-serif; font-size:.95rem; color:var(--ink);
+  outline:none; transition:border-color .2s; box-shadow:var(--shadow-sm);
+}
+.search-wrap input:focus { border-color:var(--amber); }
+.search-wrap input::placeholder { color:var(--fog-lt); }
+.search-btn {
+  position:absolute; right:.45rem; top:50%; transform:translateY(-50%);
+  background:var(--amber); color:var(--white); border:none;
+  border-radius:var(--r-md); padding:.42rem .85rem;
+  font-size:.82rem; font-weight:500; cursor:pointer; transition:background .2s;
+}
+.search-btn:hover { background:var(--amber-lt); }
+
+/* ── AUTOCOMPLETE ── */
+.ac-list {
+  position:absolute; top:calc(100% + 5px); left:0; right:0;
+  background:var(--white); border:1.5px solid var(--fog-lt);
+  border-radius:var(--r-md); box-shadow:var(--shadow-lg);
+  z-index:300; max-height:260px; overflow-y:auto; display:none;
+}
+.ac-list.open { display:block; }
+.ac-item {
+  padding:.65rem 1rem; cursor:pointer;
+  border-bottom:1px solid var(--cream); transition:background .12s;
+}
+.ac-item:last-child { border-bottom:none; }
+.ac-item:hover { background:var(--cream); }
+.ac-t { font-size:.88rem; font-weight:500; }
+.ac-a { font-size:.75rem; color:var(--fog); }
+
+/* ── READ CHIPS ── */
+.read-list {
+  display:flex; flex-wrap:wrap; gap:.45rem;
+  justify-content:center; margin:.8rem auto 1.2rem;
+  max-width:600px; min-height:38px;
+}
+.read-chip {
+  display:inline-flex; align-items:center; gap:.35rem;
+  background:var(--ink); color:var(--white);
+  border-radius:999px; padding:.3rem .8rem;
+  font-size:.8rem; font-weight:500;
+  animation:popIn .2s var(--ease);
+}
+@keyframes popIn { from{opacity:0;transform:scale(.75)} to{opacity:1;transform:scale(1)} }
+.read-chip button {
+  background:none; border:none; color:rgba(255,255,255,.5);
+  cursor:pointer; font-size:.95rem; line-height:1; transition:color .15s;
+}
+.read-chip button:hover { color:var(--white); }
+
+/* ── CTA BUTTON ── */
+.cta-btn {
+  background:var(--moss); color:var(--white); border:none;
+  border-radius:var(--r-md); padding:.75rem 1.9rem;
+  font-family:'DM Sans',sans-serif; font-size:.92rem; font-weight:500;
+  cursor:pointer; transition:all .2s; box-shadow:var(--shadow-sm);
+  letter-spacing:.02em;
+}
+.cta-btn:hover { background:var(--moss-lt); transform:translateY(-1px); box-shadow:var(--shadow-md); }
+.cta-btn:disabled { background:var(--fog-lt); cursor:not-allowed; transform:none; }
+
+/* ── CARDS ── */
+.card {
+  background:var(--white); border:1px solid var(--fog-lt);
+  border-radius:var(--r-lg); padding:1.1rem 1.3rem;
+  box-shadow:var(--shadow-sm); transition:all .2s var(--ease);
+}
+.card:hover { box-shadow:var(--shadow-md); transform:translateY(-2px); }
+.card-title {
+  font-family:'Instrument Serif',serif; font-size:1rem;
+  font-weight:400; color:var(--ink); margin-bottom:.2rem; line-height:1.3;
+}
+.card-author { font-size:.78rem; color:var(--fog); margin-bottom:.55rem; }
+.card-summary { font-size:.8rem; color:var(--fog); line-height:1.65; margin-top:.5rem; }
+
+/* ── TAGS ── */
+.tags { display:flex; flex-wrap:wrap; gap:.3rem; margin-bottom:.6rem; }
+.tag { font-size:.7rem; font-weight:500; padding:.18rem .55rem; border-radius:999px; }
+.tag-genre { background:var(--cream); color:var(--fog); border:1px solid var(--fog-lt); }
+.tag-id { background:#e8f4ea; color:var(--moss); border:1px solid #b8d8ba; }
+.tag-en { background:#e8eef8; color:#3a5a8a; border:1px solid #b8c8e8; }
+
+/* ── COMPLEXITY BAR ── */
+.cw { margin:.5rem 0; }
+.cw-row { display:flex; justify-content:space-between; font-size:.73rem; color:var(--fog); margin-bottom:.28rem; }
+.c-badge { font-weight:600; font-size:.78rem; padding:.08rem .45rem; border-radius:999px; }
+.bar-t { height:5px; background:var(--cream); border-radius:999px; overflow:hidden; }
+.bar-f { height:100%; border-radius:999px; transition:width .6s var(--ease); }
+.c-sangat-mudah { background:#4CAF50; }
+.c-mudah        { background:#8BC34A; }
+.c-menengah     { background:#FFC107; }
+.c-sulit        { background:#FF9800; }
+.c-sangat-sulit { background:#F44336; }
+.b-sangat-mudah { background:#e8f5e9; color:#2e7d32; }
+.b-mudah        { background:#f1f8e9; color:#558b2f; }
+.b-menengah     { background:#fff8e1; color:#f57f17; }
+.b-sulit        { background:#fff3e0; color:#e65100; }
+.b-sangat-sulit { background:#fbe9e7; color:#bf360c; }
+
+/* ── SEARCH RESULTS GRID ── */
+.search-grid {
+  display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+  gap:1rem; margin-top:1.4rem;
+}
+.search-card {
+  background:var(--white); border:1px solid var(--fog-lt);
+  border-radius:var(--r-lg); padding:1.1rem 1.3rem;
+  box-shadow:var(--shadow-sm); transition:all .2s var(--ease);
+  cursor:pointer;
+}
+.search-card:hover { box-shadow:var(--shadow-md); transform:translateY(-2px); border-color:var(--amber); }
+
+/* ── MODAL (detail buku) ── */
+.modal-overlay {
+  position:fixed; inset:0; background:rgba(26,22,18,.5);
+  z-index:500; display:none; align-items:center; justify-content:center;
+  padding:1rem;
+  backdrop-filter:blur(3px);
+}
+.modal-overlay.open { display:flex; animation:fadeIn .2s var(--ease); }
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+.modal {
+  background:var(--white); border-radius:var(--r-lg);
+  padding:2rem; max-width:540px; width:100%;
+  box-shadow:var(--shadow-lg); position:relative;
+  max-height:85vh; overflow-y:auto;
+  animation:modalIn .25s var(--ease);
+}
+@keyframes modalIn { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+.modal-close {
+  position:absolute; top:1rem; right:1rem;
+  background:var(--cream); border:none; border-radius:var(--r-sm);
+  width:30px; height:30px; cursor:pointer; font-size:1rem;
+  display:flex; align-items:center; justify-content:center;
+  color:var(--fog); transition:all .15s;
+}
+.modal-close:hover { background:var(--fog-lt); color:var(--ink); }
+.modal-title {
+  font-family:'Instrument Serif',serif; font-size:1.5rem;
+  font-weight:400; margin-bottom:.25rem; line-height:1.25;
+  padding-right:2rem;
+}
+.modal-author { font-size:.85rem; color:var(--fog); margin-bottom:1rem; }
+.modal-summary {
+  font-size:.88rem; line-height:1.75; color:var(--fog);
+  border-top:1px solid var(--cream); padding-top:.9rem; margin-top:.9rem;
+}
+.modal-summary-lbl {
+  font-size:.7rem; text-transform:uppercase; letter-spacing:.12em;
+  color:var(--fog-lt); margin-bottom:.4rem; font-weight:500;
+}
+.modal-add-btn {
+  margin-top:1.2rem; width:100%;
+  background:var(--moss); color:var(--white); border:none;
+  border-radius:var(--r-md); padding:.7rem; font-size:.88rem;
+  font-weight:500; cursor:pointer; font-family:'DM Sans',sans-serif;
+  transition:background .2s;
+}
+.modal-add-btn:hover { background:var(--moss-lt); }
+.modal-add-btn.added { background:var(--fog-lt); cursor:default; }
+
+/* ══════════════════════════════════════════════════════════
+   ROADMAP PAGE
+══════════════════════════════════════════════════════════ */
+.rm-layout {
+  display:grid; grid-template-columns:200px 1fr; gap:1.2rem; align-items:start;
+}
+@media(max-width:700px) { .rm-layout { grid-template-columns:1fr; } }
+
+/* Level sidebar */
+.level-card {
+  background:var(--ink); color:var(--white);
+  border-radius:var(--r-lg); padding:1.1rem 1.2rem; margin-bottom:.9rem;
+}
+.lc-eyebrow {
+  font-size:.68rem; text-transform:uppercase; letter-spacing:.14em;
+  color:rgba(255,255,255,.4); margin-bottom:.5rem;
+}
+.lc-score {
+  font-family:'Instrument Serif',serif; font-size:2.4rem; font-weight:400; line-height:1;
+}
+.lc-label { font-size:.8rem; color:rgba(255,255,255,.55); margin-top:.3rem; }
+.lc-bar-t { height:3px; background:rgba(255,255,255,.12); border-radius:999px; margin-top:.8rem; overflow:hidden; }
+.lc-bar-f { height:100%; border-radius:999px; background:var(--amber); transition:width .8s var(--ease); }
+
+.target-card {
+  background:var(--cream); border:1px solid var(--fog-lt);
+  border-radius:var(--r-md); padding:.8rem 1rem;
+}
+.target-card .tc-lbl { font-size:.68rem; text-transform:uppercase; letter-spacing:.1em; color:var(--fog-lt); margin-bottom:.3rem; }
+.target-card .tc-val { font-size:.85rem; color:var(--ink); font-weight:500; }
+
+/* ══════════════════════════════════════════════════════════
+   MIND MAP  (pure SVG + HTML overlay)
+══════════════════════════════════════════════════════════ */
+#map-wrap {
+  position:relative; background:var(--white);
+  border:1px solid var(--fog-lt); border-radius:var(--r-lg);
+  box-shadow:var(--shadow-sm); overflow:hidden;
+  height:520px; cursor:grab;
+}
+#map-wrap:active { cursor:grabbing; }
+
+/* SVG layer (edges) */
+#map-svg { position:absolute; inset:0; width:100%; height:100%; overflow:visible; }
+
+/* Nodes HTML overlay */
+#map-nodes { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; }
+
+/* Individual node */
+.mn {
+  position:absolute; transform:translate(-50%,-50%);
+  pointer-events:all; cursor:pointer;
+  background:var(--white); border:2px solid var(--fog-lt);
+  border-radius:14px; padding:.55rem .75rem;
+  box-shadow:var(--shadow-sm); width:150px; text-align:center;
+  transition:box-shadow .2s, border-color .2s, transform .15s;
+  animation:nodeIn .35s var(--ease) both;
+  user-select:none;
+}
+.mn:hover { box-shadow:var(--shadow-md); transform:translate(-50%,-50%) scale(1.04); z-index:10; }
+.mn.read { border-color:var(--amber); background:#fffbf5; }
+.mn.rec  { border-color:var(--moss-lt); background:#f5fbf5; }
+.mn.selected { border-color:var(--ink); box-shadow:0 0 0 3px rgba(26,22,18,.15),var(--shadow-md); z-index:20; }
+@keyframes nodeIn {
+  from { opacity:0; transform:translate(-50%,-50%) scale(.65); }
+  to   { opacity:1; transform:translate(-50%,-50%) scale(1); }
+}
+.mn-type { font-size:.6rem; text-transform:uppercase; letter-spacing:.1em; color:var(--fog-lt); margin-bottom:.2rem; }
+.mn-title {
+  font-family:'Instrument Serif',serif; font-size:.82rem; line-height:1.3;
+  display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
+}
+.mn-score {
+  display:inline-block; margin-top:.3rem;
+  font-size:.68rem; font-weight:600;
+  padding:.1rem .4rem; border-radius:999px;
+}
+
+/* Map controls */
+.map-ctrls {
+  position:absolute; bottom:.9rem; right:.9rem;
+  display:flex; flex-direction:column; gap:.35rem; z-index:30;
+}
+.mc-btn {
+  width:30px; height:30px; background:var(--white); border:1px solid var(--fog-lt);
+  border-radius:var(--r-sm); cursor:pointer; font-size:.95rem;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow:var(--shadow-sm); transition:background .15s; color:var(--ink);
+}
+.mc-btn:hover { background:var(--cream); }
+
+/* Legend */
+.map-legend {
+  position:absolute; top:.75rem; left:.75rem;
+  display:flex; gap:.5rem; z-index:30;
+}
+.ml-item {
+  display:flex; align-items:center; gap:.3rem;
+  background:rgba(253,250,244,.92); border:1px solid var(--fog-lt);
+  border-radius:var(--r-sm); padding:.18rem .5rem; font-size:.7rem; color:var(--fog);
+}
+.ml-dot { width:9px; height:9px; border-radius:3px; flex-shrink:0; }
+
+/* Map detail panel bawah */
+#map-detail {
+  background:var(--white); border:1px solid var(--fog-lt);
+  border-radius:var(--r-lg); padding:1.2rem 1.4rem;
+  margin-top:1rem; box-shadow:var(--shadow-sm);
+  display:none;
+  animation:fadeUp .25s var(--ease);
+}
+#map-detail.show { display:block; }
+.md-title { font-family:'Instrument Serif',serif; font-size:1.25rem; font-weight:400; margin-bottom:.2rem; }
+.md-author { font-size:.82rem; color:var(--fog); margin-bottom:.7rem; }
+.md-summary { font-size:.83rem; color:var(--fog); line-height:1.7; margin-top:.8rem; border-top:1px solid var(--cream); padding-top:.8rem; }
+.md-sum-lbl { font-size:.68rem; text-transform:uppercase; letter-spacing:.12em; color:var(--fog-lt); margin-bottom:.35rem; }
+.delta-pill {
+  display:inline-flex; align-items:center; gap:.25rem;
+  background:#e8f4ea; color:var(--moss); border:1px solid #b8d8ba;
+  border-radius:999px; padding:.15rem .55rem; font-size:.73rem; font-weight:600;
+}
+
+/* ── LOADING / EMPTY ── */
+.loading-box { display:flex; align-items:center; justify-content:center; gap:.55rem; color:var(--fog); font-size:.88rem; padding:3rem; }
+.spinner { width:18px; height:18px; border:2px solid var(--fog-lt); border-top-color:var(--amber); border-radius:50%; animation:spin .65s linear infinite; }
+@keyframes spin { to{ transform:rotate(360deg); } }
+.empty-state { text-align:center; padding:3rem 1rem; color:var(--fog); }
+.empty-state .ei { font-size:2.2rem; margin-bottom:.7rem; opacity:.4; }
+.empty-state p { font-size:.88rem; line-height:1.75; }
+
+/* ── PROFIL PAGE ── */
+.profil-header {
+  display:flex; align-items:center; gap:1.2rem; margin-bottom:2rem;
+  padding-bottom:1.5rem; border-bottom:1px solid var(--fog-lt);
+}
+.avatar {
+  width:56px; height:56px; border-radius:50%;
+  background:var(--ink); color:var(--white);
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Instrument Serif',serif; font-size:1.4rem; flex-shrink:0;
+}
+.profil-name { font-family:'Instrument Serif',serif; font-size:1.4rem; font-weight:400; }
+.profil-sub  { font-size:.82rem; color:var(--fog); margin-top:.2rem; }
+.stat-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:.8rem; margin-bottom:2rem; }
+.stat-card {
+  background:var(--white); border:1px solid var(--fog-lt);
+  border-radius:var(--r-md); padding:.9rem 1rem;
+}
+.stat-lbl { font-size:.7rem; text-transform:uppercase; letter-spacing:.1em; color:var(--fog-lt); margin-bottom:.35rem; }
+.stat-val { font-family:'Instrument Serif',serif; font-size:1.6rem; font-weight:400; line-height:1; }
+.stat-sub { font-size:.75rem; color:var(--fog); margin-top:.25rem; }
+.level-progress-wrap {
+  background:var(--white); border:1px solid var(--fog-lt);
+  border-radius:var(--r-lg); padding:1.2rem 1.4rem; margin-bottom:2rem;
+}
+.lp-header { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:.6rem; }
+.lp-title  { font-size:.88rem; font-weight:500; }
+.lp-pct    { font-size:.78rem; color:var(--fog); }
+.lp-track  { height:8px; background:var(--cream); border-radius:999px; overflow:hidden; margin-bottom:.5rem; }
+.lp-fill   { height:100%; border-radius:999px; background:var(--moss); transition:width 1s var(--ease); }
+.lp-labels { display:flex; justify-content:space-between; font-size:.72rem; color:var(--fog-lt); }
+.lp-milestone {
+  display:inline-flex; align-items:center; gap:.35rem;
+  background:var(--cream); border:1px solid var(--fog-lt);
+  border-radius:999px; padding:.22rem .65rem; font-size:.74rem; color:var(--fog); margin-top:.6rem;
+}
+.lp-milestone b { color:var(--ink); }
+.profil-two-col { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:2rem; }
+@media(max-width:640px){ .profil-two-col{ grid-template-columns:1fr; } .stat-grid{ grid-template-columns:1fr 1fr; } }
+.genre-wrap {
+  background:var(--white); border:1px solid var(--fog-lt);
+  border-radius:var(--r-lg); padding:1.2rem 1.4rem;
+}
+.genre-row { display:flex; align-items:center; gap:.7rem; margin-bottom:.55rem; }
+.genre-row:last-child { margin-bottom:0; }
+.genre-name { font-size:.8rem; color:var(--ink); width:130px; flex-shrink:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.genre-bar-t { flex:1; height:6px; background:var(--cream); border-radius:999px; overflow:hidden; }
+.genre-bar-f { height:100%; border-radius:999px; background:var(--amber); transition:width .6s var(--ease); }
+.genre-count { font-size:.74rem; color:var(--fog); width:20px; text-align:right; flex-shrink:0; }
+.profil-library {
+  background:var(--white); border:1px solid var(--fog-lt);
+  border-radius:var(--r-lg); padding:1.2rem 1.4rem;
+}
+.lib-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:1rem; flex-wrap:wrap; gap:.6rem; }
+.lib-search-wrap { position:relative; width:200px; }
+.lib-search-wrap input {
+  width:100%; background:var(--cream); border:1px solid var(--fog-lt);
+  border-radius:var(--r-md); padding:.42rem 2rem .42rem .75rem;
+  font-size:.82rem; font-family:'DM Sans',sans-serif; color:var(--ink); outline:none; transition:border-color .2s;
+}
+.lib-search-wrap input:focus { border-color:var(--amber); background:var(--white); }
+.lib-search-wrap input::placeholder { color:var(--fog-lt); }
+.lib-search-icon { position:absolute; right:.5rem; top:50%; transform:translateY(-50%); color:var(--fog-lt); font-size:.85rem; pointer-events:none; }
+.lib-empty { text-align:center; padding:2rem 1rem; color:var(--fog); font-size:.85rem; }
+.lib-item {
+  display:flex; align-items:center; gap:.8rem;
+  padding:.7rem 0; border-bottom:1px solid var(--cream);
+}
+.lib-item:last-child { border-bottom:none; padding-bottom:0; }
+.lib-num {
+  width:22px; height:22px; border-radius:50%; background:var(--cream);
+  color:var(--fog); font-size:.7rem; font-weight:500;
+  display:flex; align-items:center; justify-content:center; flex-shrink:0;
+}
+.lib-info { flex:1; min-width:0; }
+.lib-title { font-family:'Instrument Serif',serif; font-size:.93rem; line-height:1.25; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.lib-author { font-size:.74rem; color:var(--fog); margin-top:.1rem; }
+.lib-right { flex-shrink:0; text-align:right; display:flex; align-items:center; gap:.5rem; }
+.lib-score { font-size:.84rem; font-weight:600; }
+.lib-score-lbl { font-size:.66rem; color:var(--fog-lt); display:block; }
+.lib-remove {
+  background:none; border:none; color:var(--fog-lt); cursor:pointer;
+  font-size:.95rem; padding:.18rem; line-height:1; border-radius:var(--r-sm); transition:all .15s;
+}
+.lib-remove:hover { color:#8b3a2a; background:var(--cream); }
+.section-label {
+  font-size:.72rem; text-transform:uppercase; letter-spacing:.12em;
+  color:var(--fog-lt); font-weight:500; margin-bottom:.7rem;
+}
+/* ── FOOTER ── */
+footer {
+  background:var(--blush);
+  color:var(--fog);
+  margin-top:4rem;
+  padding:3rem 2rem 1.5rem;
+  border-top:1px solid rgba(232,121,154,.25);
+}
+.footer-inner {
+  max-width:1160px; margin:0 auto;
+  display:grid; grid-template-columns:2fr 1fr 1fr; gap:2.5rem;
+  padding-bottom:2rem;
+  border-bottom:1px solid rgba(232,121,154,.2);
+}
+@media(max-width:680px){
+  .footer-inner { grid-template-columns:1fr; gap:1.8rem; }
+}
+.footer-brand-name {
+  font-family:'Playfair Display',serif;
+  font-size:1.35rem; font-weight:600; color:var(--ink);
+  display:flex; align-items:center; gap:.5rem; margin-bottom:.4rem;
+}
+.footer-brand-dot {
+  width:7px; height:7px; border-radius:50%; background:var(--rose); flex-shrink:0;
+}
+.footer-tagline {
+  font-size:.78rem; letter-spacing:.12em; text-transform:uppercase;
+  color:var(--rose); margin-bottom:.9rem; font-weight:500;
+}
+.footer-desc {
+  font-size:.84rem; line-height:1.75; color:var(--fog);
+  max-width:320px;
+}
+.footer-col-title {
+  font-size:.7rem; text-transform:uppercase; letter-spacing:.14em;
+  color:var(--rose-dk); font-weight:500; margin-bottom:.8rem;
+}
+.footer-links { list-style:none; display:flex; flex-direction:column; gap:.45rem; }
+.footer-links li button {
+  background:none; border:none; cursor:pointer; padding:0;
+  font-family:'DM Sans',sans-serif; font-size:.84rem;
+  color:var(--fog); transition:color .15s; text-align:left;
+}
+.footer-links li button:hover { color:var(--ink); }
+.footer-bottom {
+  max-width:1160px; margin:1.2rem auto 0;
+  display:flex; align-items:center; justify-content:space-between;
+  flex-wrap:wrap; gap:.6rem;
+}
+.footer-copy { font-size:.75rem; color:var(--fog-lt); }
+.footer-credit { font-size:.75rem; color:var(--fog-lt); text-align:right; }
+.footer-heart { color:var(--rose); }
+
+/* ── TOAST ── */
+#toast {
+  position:fixed; bottom:1.8rem; left:50%;
+  transform:translateX(-50%) translateY(16px);
+  background:var(--ink); color:var(--white);
+  padding:.65rem 1.4rem; border-radius:var(--r-md);
+  font-size:.82rem; font-weight:500;
+  z-index:9000; opacity:0; pointer-events:none;
+  transition:opacity .25s var(--ease), transform .25s var(--ease);
+  box-shadow:var(--shadow-lg); white-space:nowrap;
+}
+#toast.show {
+  opacity:1; transform:translateX(-50%) translateY(0);
+  pointer-events:none;
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="logo" onclick="showPage('home')">
+    <div class="logo-dot"></div>Book Diary
+  </div>
+  <nav>
+    <button id="nav-home"    onclick="showPage('home')"    class="active">Beranda</button>
+    <button id="nav-search"  onclick="showPage('search')">Cari Buku</button>
+    <button id="nav-roadmap" onclick="showPage('roadmap')">Peta Jalan</button>
+    <button id="nav-profil"  onclick="showPage('profil')">Profil</button>
+  </nav>
+</header>
+
+<main>
+
+<!-- ═══════════════════════ HOME ═══════════════════════ -->
+<div class="page active" id="page-home">
+  <div class="hero">
+    <p class="hero-eyebrow">✦ Rekomendasi Bacaan Cerdas</p>
+    <h1>Bacaan yang <em>tepat</em>,<br>di waktu yang tepat.</h1>
+    <p>Masukkan buku yang sudah kamu selesaikan. AI menganalisis kompleksitasnya dan merekomendasikan buku berikutnya yang sedikit lebih menantang.</p>
+
+    <div class="badge-level" id="home-badge">
+      <span id="badge-icon">📚</span>
+      <span id="badge-label">Mulai perjalanan literasimu</span>
+      <span class="lbl">Tambahkan buku untuk melihat levelmu</span>
+    </div>
+
+    <div class="search-wrap">
+      <input type="text" id="home-input" placeholder="Ketik judul buku yang sudah dibaca…"
+             autocomplete="off" oninput="onHomeType(this.value)" onkeydown="onHomeKey(event)">
+      <button class="search-btn" onclick="addFromInput()">Tambah</button>
+      <div class="ac-list" id="home-ac"></div>
+    </div>
+
+    <div class="read-list" id="read-list"></div>
+    <br>
+    <button class="cta-btn" id="cta" onclick="goRoadmap()" disabled>Lihat Peta Jalan →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════ SEARCH ═══════════════════════ -->
+<div class="page" id="page-search">
+  <h2 class="section-title">Cari <span>Buku</span></h2>
+  <div class="search-wrap" style="max-width:460px;margin:0 0 0 0">
+    <input type="text" id="search-input" placeholder="Judul atau nama penulis…"
+           onkeydown="if(event.key==='Enter')doSearch()">
+    <button class="search-btn" onclick="doSearch()">Cari</button>
+  </div>
+  <div id="search-results" class="search-grid"></div>
+</div>
+
+<!-- ═══════════════════════ ROADMAP ═══════════════════════ -->
+<div class="page" id="page-roadmap">
+  <h2 class="section-title">Peta <span>Perjalanan</span></h2>
+
+  <div id="rm-loading" class="loading-box" style="display:none">
+    <div class="spinner"></div>Membangun peta literasimu…
+  </div>
+
+  <div id="rm-empty" class="empty-state">
+    <div class="ei">🧭</div>
+    <p>Belum ada buku yang ditambahkan.<br>
+    Kembali ke <a href="#" onclick="showPage('home')" style="color:var(--amber)">Beranda</a> dan masukkan buku yang sudah kamu baca.</p>
+  </div>
+
+  <div id="rm-content" style="display:none">
+    <div class="rm-layout">
+      <!-- Sidebar level -->
+      <div>
+        <div class="level-card">
+          <div class="lc-eyebrow">Level Literasimu</div>
+          <div class="lc-score" id="lc-score">–</div>
+          <div class="lc-label" id="lc-label">–</div>
+          <div class="lc-bar-t"><div class="lc-bar-f" id="lc-bar" style="width:0%"></div></div>
+        </div>
+        <div class="target-card">
+          <div class="tc-lbl">Target berikutnya</div>
+          <div class="tc-val" id="tc-val">–</div>
+        </div>
+      </div>
+
+      <!-- Mind map -->
+      <div>
+        <div id="map-wrap">
+          <svg id="map-svg"></svg>
+          <div id="map-nodes"></div>
+          <div class="map-legend">
+            <div class="ml-item"><div class="ml-dot" style="background:var(--amber)"></div>Sudah dibaca</div>
+            <div class="ml-item"><div class="ml-dot" style="background:var(--moss-lt)"></div>Rekomendasi</div>
+          </div>
+          <div class="map-ctrls">
+            <button class="mc-btn" onclick="mapZoom(1.2)" title="Zoom in">+</button>
+            <button class="mc-btn" onclick="mapZoom(.83)" title="Zoom out">−</button>
+            <button class="mc-btn" onclick="mapReset()" title="Reset">⌖</button>
+          </div>
+        </div>
+        <!-- Detail panel muncul di bawah map saat node diklik -->
+        <div id="map-detail"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ PROFIL ═══════════════════════ -->
+<div class="page" id="page-profil">
+
+  <!-- Header profil -->
+  <div class="profil-header">
+    <div class="avatar" id="profil-avatar">📚</div>
+    <div>
+      <div class="profil-name" id="profil-name">Pembaca Literasi</div>
+      <div class="profil-sub" id="profil-sub">Bergabung hari ini · 0 buku dibaca</div>
+    </div>
+  </div>
+
+  <!-- Stat cards -->
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="stat-lbl">Buku dibaca</div>
+      <div class="stat-val" id="st-total">0</div>
+      <div class="stat-sub">dari daftar kamu</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-lbl">Rata-rata skor</div>
+      <div class="stat-val" id="st-avg">–</div>
+      <div class="stat-sub" id="st-avg-lbl">belum ada buku</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-lbl">Genre favorit</div>
+      <div class="stat-val" id="st-genre" style="font-size:1rem;padding-top:.3rem;line-height:1.4">–</div>
+      <div class="stat-sub">berdasarkan daftar baca</div>
+    </div>
+  </div>
+
+  <!-- Progress bar level -->
+  <div class="level-progress-wrap">
+    <div class="lp-header">
+      <span class="lp-title">Progress menuju level berikutnya</span>
+      <span class="lp-pct" id="lp-pct">0%</span>
+    </div>
+    <div class="lp-track"><div class="lp-fill" id="lp-fill" style="width:0%"></div></div>
+    <div class="lp-labels">
+      <span id="lp-cur-lbl">–</span>
+      <span id="lp-next-lbl">–</span>
+    </div>
+    <div style="margin-top:.6rem">
+      <span class="lp-milestone" id="lp-milestone">Tambahkan buku untuk melihat progress</span>
+    </div>
+  </div>
+
+  <!-- Genre chart + perpustakaan dalam 2 kolom -->
+  <div class="profil-two-col">
+
+    <!-- Genre favorit -->
+    <div class="genre-wrap">
+      <div class="section-label">Genre favorit</div>
+      <div id="genre-chart">
+        <div class="lib-empty">Belum ada data genre</div>
+      </div>
+    </div>
+
+    <!-- Info level -->
+    <div class="genre-wrap">
+      <div class="section-label">Panduan level</div>
+      <div id="level-guide" style="display:flex;flex-direction:column;gap:.5rem;margin-top:.2rem"></div>
+    </div>
+
+  </div>
+
+  <!-- Perpustakaan pribadi -->
+  <div class="profil-library">
+    <div class="lib-header">
+      <div>
+        <div class="section-label" style="margin-bottom:0">Perpustakaan pribadi</div>
+      </div>
+      <div class="lib-search-wrap">
+        <input type="text" id="lib-search" placeholder="Cari judul…"
+               oninput="filterLibrary(this.value)">
+        <span class="lib-search-icon">🔍</span>
+      </div>
+    </div>
+    <div id="lib-list">
+      <div class="lib-empty">Belum ada buku. Tambahkan dari halaman Beranda.</div>
+    </div>
+  </div>
+
+</div>
+
+</main>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+
+    <!-- Kolom 1: Brand + deskripsi -->
+    <div>
+      <div class="footer-brand-name">
+        <div class="footer-brand-dot"></div>
+        Book Diary
+      </div>
+      <div class="footer-tagline">Leveling Up Your Reading Journey</div>
+      <p class="footer-desc">
+        Book Diary membantu kamu menemukan buku bacaan berikutnya secara cerdas —
+        menganalisis kompleksitas buku yang sudah kamu selesaikan, lalu merekomendasikan
+        judul yang sedikit lebih menantang agar kemampuan literasimu terus berkembang
+        secara bertahap dan terukur.
+      </p>
+    </div>
+
+    <!-- Kolom 2: Navigasi -->
+    <div>
+      <div class="footer-col-title">Navigasi</div>
+      <ul class="footer-links">
+        <li><button onclick="showPage('home')">🏠 Beranda</button></li>
+        <li><button onclick="showPage('search')">🔍 Cari Buku</button></li>
+        <li><button onclick="showPage('roadmap')">🗺️ Peta Jalan</button></li>
+        <li><button onclick="showPage('profil')">👤 Profil</button></li>
+      </ul>
+    </div>
+
+    <!-- Kolom 3: Tentang -->
+    <div>
+      <div class="footer-col-title">Tentang</div>
+      <ul class="footer-links">
+        <li><button onclick="void 0" style="cursor:default">📚 Book Recommendation AI</button></li>
+        <li><button onclick="void 0" style="cursor:default">🎓 Tugas Mata Kuliah AI</button></li>
+        <li><button onclick="void 0" style="cursor:default">💻 Informatika UNDIP</button></li>
+      </ul>
+    </div>
+
+  </div>
+
+  <!-- Bottom bar -->
+  <div class="footer-bottom">
+    <span class="footer-copy">© 2026 Book Diary. All rights reserved.</span>
+    <span class="footer-credit">
+      Dibuat dengan <span class="footer-heart">♥</span> oleh
+      Kelompok Ayam Geprek Kelas C · Mata Kuliah AI · Informatika UNDIP 2026
+    </span>
+  </div>
+</footer>
+<div class="modal-overlay" id="modal" onclick="closeModal(event)">
+  <div class="modal" id="modal-box">
+    <button class="modal-close" onclick="closeModalBtn()">✕</button>
+    <div id="modal-content"></div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+/* ══════════════════════════════════════════════════════════
+   CONFIG & STATE
+══════════════════════════════════════════════════════════ */
+const API = 'http://localhost:5000';
+
+const S = {
+  books:      [],      // buku yang sudah dibaca
+  roadmap:    null,    // data roadmap terakhir
+  mapScale:   1,
+  mapOX:      0,
+  mapOY:      0,
+  dragging:   false,
+  dragStart:  {x:0,y:0},
+  allNodes:   [],      // semua node yang di-render
+  allBooks:   [],      // gabungan source + recs untuk lookup
+};
+
+/* ══════════════════════════════════════════════════════════
+   NAV
+══════════════════════════════════════════════════════════ */
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  document.getElementById('nav-' + id).classList.add('active');
+  if (id === 'roadmap') loadRoadmap();
+}
+
+/* ══════════════════════════════════════════════════════════
+   TOAST — klik untuk dismiss, auto-dismiss setelah ms
+══════════════════════════════════════════════════════════ */
+let _toastTimer;
+function toast(msg, ms=2800) {
+  clearTimeout(_toastTimer);
+  const el = document.getElementById('toast');
+  el.classList.remove('show');
+  el.textContent = msg;
+  void el.offsetWidth;   // force reflow agar transition terpicu ulang
+  el.classList.add('show');
+  _toastTimer = setTimeout(() => el.classList.remove('show'), ms);
+}
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('toast').addEventListener('click', () => {
+    clearTimeout(_toastTimer);
+    document.getElementById('toast').classList.remove('show');
+  });
+});
+
+/* ══════════════════════════════════════════════════════════
+   HELPERS: complexity
+══════════════════════════════════════════════════════════ */
+function cCls(label) {
+  const m = {'Sangat Mudah':'sangat-mudah','Mudah':'mudah','Menengah':'menengah','Sulit':'sulit','Sangat Sulit':'sangat-sulit'};
+  return m[label] || 'menengah';
+}
+function levelLabel(s) {
+  if (s<=20) return 'Sangat Mudah';
+  if (s<=40) return 'Mudah';
+  if (s<=60) return 'Menengah';
+  if (s<=80) return 'Sulit';
+  return 'Sangat Sulit';
+}
+function barHTML(score, label) {
+  const c = cCls(label);
+  return `<div class="cw">
+    <div class="cw-row"><span>${label}</span><span class="c-badge b-${c}">${score}</span></div>
+    <div class="bar-t"><div class="bar-f c-${c}" style="width:${score}%"></div></div>
+  </div>`;
+}
+function tagsHTML(b) {
+  const lc  = b.language==='id'?'tag-id':'tag-en';
+  const lt  = b.language==='id'?'ID':'EN';
+  const genres = (b.genre_list || (b.genre||'').split('|')).slice(0,3);
+  return `<div class="tags">
+    <span class="tag ${lc}">${lt}</span>
+    ${genres.map(g=>`<span class="tag tag-genre">${g}</span>`).join('')}
+  </div>`;
+}
+
+/* ══════════════════════════════════════════════════════════
+   HOME — AUTOCOMPLETE
+══════════════════════════════════════════════════════════ */
+let _acTimer;
+function onHomeType(v) {
+  clearTimeout(_acTimer);
+  const ac = document.getElementById('home-ac');
+  if (v.length < 2) { ac.classList.remove('open'); return; }
+  _acTimer = setTimeout(async () => {
+    try {
+      const r = await fetch(`${API}/api/books/search?q=${encodeURIComponent(v)}&limit=6`);
+      const d = await r.json();
+      if (!d.data?.books?.length) { ac.classList.remove('open'); return; }
+      ac.innerHTML = d.data.books.map(b =>
+        `<div class="ac-item" onclick='pickBook(${JSON.stringify(b).replace(/'/g,"\\'")})'> 
+           <div class="ac-t">${b.title}</div>
+           <div class="ac-a">${b.author||''}</div>
+         </div>`).join('');
+      ac.classList.add('open');
+    } catch { ac.classList.remove('open'); }
+  }, 280);
+}
+
+function onHomeKey(e) { if(e.key==='Enter') addFromInput(); }
+
+async function addFromInput() {
+  const v = document.getElementById('home-input').value.trim();
+  if (!v) return;
+  document.getElementById('home-ac').classList.remove('open');
+  try {
+    const r = await fetch(`${API}/api/books/search?q=${encodeURIComponent(v)}&limit=1`);
+    const d = await r.json();
+    if (d.data?.books?.length) pickBook(d.data.books[0]);
+    else toast('Buku tidak ditemukan. Coba judul lebih spesifik.');
+  } catch { toast('Tidak bisa terhubung ke server. Pastikan API berjalan.'); }
+}
+
+function pickBook(b) {
+  if (S.books.find(x => x.book_id === b.book_id)) { toast(`"${b.title}" sudah ada.`); return; }
+  // Tidak ada batas — simpan semua buku yang ditambahkan
+  S.books.push(b);
+  S.roadmap = null;
+  renderReadList();
+  updateBadge();
+  document.getElementById('home-input').value = '';
+  document.getElementById('home-ac').classList.remove('open');
+  toast(`✓  "${b.title}" ditambahkan`);
+}
+
+function removeBook(id) {
+  S.books = S.books.filter(b => b.book_id !== id);
+  S.roadmap = null;
+  renderReadList();
+  updateBadge();
+}
+
+function renderReadList() {
+  // Tampilkan 5 buku TERBARU di beranda (terbaru = index terakhir)
+  const recent   = S.books.slice(-5).reverse();
+  const overflow = S.books.length > 5 ? S.books.length - 5 : 0;
+
+  document.getElementById('read-list').innerHTML =
+    recent.map(b => `
+      <div class="read-chip">
+        ${b.title.length>26 ? b.title.slice(0,26)+'…' : b.title}
+        <button onclick="removeBook(${b.book_id})">×</button>
+      </div>`).join('') +
+    (overflow > 0
+      ? `<div class="read-chip" style="background:var(--fog);cursor:pointer"
+             onclick="showPage('profil')" title="Lihat semua di Profil">
+           +${overflow} lainnya →
+         </div>`
+      : '');
+
+  document.getElementById('cta').disabled = S.books.length === 0;
+}
+
+function updateBadge() {
+  if (!S.books.length) {
+    document.getElementById('badge-icon').textContent = '📚';
+    document.getElementById('badge-label').textContent = 'Mulai perjalanan literasimu';
+    return;
+  }
+  const avg = S.books.reduce((s,b)=>s+(b.complexity_score||50),0)/S.books.length;
+  const lbl = levelLabel(avg);
+  const icons = {'Sangat Mudah':'🌱','Mudah':'📗','Menengah':'📘','Sulit':'📙','Sangat Sulit':'🏆'};
+  document.getElementById('badge-icon').textContent  = icons[lbl]||'📚';
+  document.getElementById('badge-label').textContent = `Level: ${lbl} (${avg.toFixed(0)} / 100)`;
+}
+
+function goRoadmap() { showPage('roadmap'); }
+
+/* ══════════════════════════════════════════════════════════
+   SEARCH PAGE — hanya untuk lihat detail
+══════════════════════════════════════════════════════════ */
+async function doSearch() {
+  const q = document.getElementById('search-input').value.trim();
+  if (!q) return;
+  const el = document.getElementById('search-results');
+  el.innerHTML = `<div class="loading-box" style="grid-column:1/-1"><div class="spinner"></div>Mencari…</div>`;
+  try {
+    const r = await fetch(`${API}/api/books/search?q=${encodeURIComponent(q)}&limit=12`);
+    const d = await r.json();
+    if (!d.data?.books?.length) {
+      el.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><div class="ei">🔍</div><p>Tidak ada hasil untuk "${q}".</p></div>`;
+      return;
+    }
+    el.innerHTML = d.data.books.map(b => `
+      <div class="search-card" onclick="openModal(${b.book_id})">
+        ${tagsHTML(b)}
+        <div class="card-title">${b.title}</div>
+        <div class="card-author">${b.author||''}</div>
+        ${barHTML(b.complexity_score, b.complexity_label)}
+        <div class="card-summary">${b.summary_short||''}</div>
+      </div>`).join('');
+  } catch {
+    el.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><div class="ei">⚠️</div><p>Gagal terhubung ke API.</p></div>`;
+  }
+}
+
+/* ── MODAL detail buku ──
+   Simpan data buku di S.modalBook (bukan inline onclick JSON string)
+   agar tidak ada masalah karakter kutip yang bentrok dengan HTML attr.
+── */
+S.modalBook = null;  // buku yang sedang dibuka di modal
+
+async function openModal(bookId) {
+  try {
+    const r = await fetch(`${API}/api/books/${bookId}`);
+    const d = await r.json();
+    if (!d.data) return;
+    const b = d.data.book;
+
+    // Simpan ke state — diakses oleh addFromModal()
+    S.modalBook = b;
+
+    const alreadyAdded = !!S.books.find(x => x.book_id === b.book_id);
+    document.getElementById('modal-content').innerHTML = `
+      ${tagsHTML(b)}
+      <div class="modal-title">${b.title}</div>
+      <div class="modal-author">✍️ ${b.author||'—'}</div>
+      ${barHTML(b.complexity_score, b.complexity_label)}
+      <div class="modal-summary">
+        <div class="modal-summary-lbl">Sinopsis</div>
+        ${b.summary_full || b.summary_short || '—'}
+      </div>
+      <button class="modal-add-btn ${alreadyAdded?'added':''}"
+              id="modal-add-btn"
+              onclick="addFromModal()"
+              ${alreadyAdded?'disabled':''}>
+        ${alreadyAdded?'✓ Sudah di daftar baca':'+ Tambahkan ke daftar baca'}
+      </button>`;
+    document.getElementById('modal').classList.add('open');
+  } catch { toast('Gagal memuat detail buku.'); }
+}
+
+function closeModal(e) {
+  if (e.target === document.getElementById('modal')) closeModalBtn();
+}
+function closeModalBtn() {
+  document.getElementById('modal').classList.remove('open');
+  S.modalBook = null;
+}
+function addFromModal() {
+  if (!S.modalBook) return;
+  pickBook(S.modalBook);
+  // Update tombol di modal tanpa tutup modal
+  const btn = document.getElementById('modal-add-btn');
+  if (btn) {
+    btn.textContent = '✓ Sudah di daftar baca';
+    btn.classList.add('added');
+    btn.disabled = true;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   ROADMAP
+══════════════════════════════════════════════════════════ */
+async function loadRoadmap() {
+  if (!S.books.length) {
+    show('rm-empty'); hide('rm-content'); hide('rm-loading'); return;
+  }
+  if (S.roadmap) {
+    show('rm-content'); hide('rm-empty'); hide('rm-loading'); return;
+  }
+  show('rm-loading'); hide('rm-content'); hide('rm-empty');
+  try {
+    const r = await fetch(`${API}/api/roadmap`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ read_books: S.books.map(b=>b.title), top_n:5 })
+    });
+    const d = await r.json();
+    if (d.status !== 'success') throw new Error(d.message);
+    S.roadmap = d.data;
+    hide('rm-loading'); show('rm-content'); hide('rm-empty');
+    renderRoadmap(d.data);
+  } catch(e) {
+    hide('rm-loading'); show('rm-empty');
+    document.getElementById('rm-empty').querySelector('p').innerHTML =
+      `Gagal memuat peta jalan.<br><small>${e.message}</small>`;
+  }
+}
+
+function show(id) { document.getElementById(id).style.display='block'; }
+function hide(id) { document.getElementById(id).style.display='none'; }
+
+function renderRoadmap(data) {
+  // Level sidebar
+  document.getElementById('lc-score').textContent = data.current_level;
+  document.getElementById('lc-label').textContent = data.current_label;
+  document.getElementById('lc-bar').style.width   = data.current_level + '%';
+  document.getElementById('tc-val').textContent   =
+    `Skor ${data.target_range.min} – ${data.target_range.max}`;
+
+  // Semua buku untuk lookup
+  S.allBooks = [...(data.source_books||[]), ...(data.recommendations||[])];
+
+  // Render mind map
+  buildMindMap(data.roadmap_visualization, data.source_books, data.recommendations);
+}
+
+/* ══════════════════════════════════════════════════════════
+   MIND MAP ENGINE — dibangun ulang dari nol
+══════════════════════════════════════════════════════════ */
+function buildMindMap(viz, sourceBooks, recs) {
+  const wrap  = document.getElementById('map-wrap');
+  const W     = wrap.clientWidth  || 700;
+  const H     = wrap.clientHeight || 520;
+
+  const recNodes = viz.nodes.filter(n => n.type === 'recommended');
+
+  /* ── Posisi ─────────────────────────────────────────────
+     Kiri   : 1 cluster node gabungan semua buku yang dibaca
+     Kanan  : rekomendasi menyebar vertikal
+  ─────────────────────────────────────────────────────── */
+  const CLUSTER_ID = 'cluster-read';
+  const clusterX   = W * 0.22;
+  const clusterY   = H * 0.5;
+
+  const recX     = W * 0.68;
+  const recTotal = recNodes.length;
+  const recPos   = {};
+  recNodes.forEach((n, i) => {
+    const spacing = Math.min(96, (H * 0.80) / Math.max(recTotal, 1));
+    const startY  = H / 2 - ((recTotal - 1) * spacing) / 2;
+    recPos[n.node_id] = { x: recX, y: startY + i * spacing };
+  });
+
+  // allNodes untuk selectNode — gabungkan cluster virtual + rec nodes
+  S.allNodes = [
+    { node_id: CLUSTER_ID, book_id: null, x: clusterX, y: clusterY, type: 'read' },
+    ...recNodes.map(n => ({ ...n, ...recPos[n.node_id] })),
+  ];
+  S.allBooks = [...(sourceBooks || []), ...(recs || [])];
+
+  /* ── Render SVG ──────────────────────────────────────── */
+  const svg = document.getElementById('map-svg');
+  svg.innerHTML = '';
+
+  // Satu garis dari cluster ke setiap rekomendasi
+  recNodes.forEach((n, i) => {
+    const to  = recPos[n.node_id];
+    const rec = S.allBooks.find(b => b.book_id === n.book_id);
+    const delta = rec?.complexity_delta ?? null;
+
+    const cx1 = clusterX + (to.x - clusterX) * 0.55;
+    const cx2 = clusterX + (to.x - clusterX) * 0.45;
+
+    // Garis kurva
+    const path = mkSVG('path');
+    path.setAttribute('d', `M${clusterX},${clusterY} C${cx1},${clusterY} ${cx2},${to.y} ${to.x},${to.y}`);
+    path.setAttribute('fill','none');
+    path.setAttribute('stroke','#ccc5b8');
+    path.setAttribute('stroke-width','1.5');
+    path.setAttribute('stroke-dasharray','5 4');
+    path.setAttribute('opacity','0.8');
+    svg.appendChild(path);
+
+    // Panah di ujung rekomendasi
+    const arr = mkSVG('polygon');
+    arr.setAttribute('points',`${to.x-12},${to.y-4} ${to.x},${to.y} ${to.x-12},${to.y+4}`);
+    arr.setAttribute('fill','var(--moss-lt)');
+    svg.appendChild(arr);
+
+    // Label delta di tengah kurva
+    if (delta !== null) {
+      const mx = (clusterX + to.x) / 2;
+      const my = (clusterY + to.y) / 2 - 12;
+      const fo = mkSVG('foreignObject');
+      fo.setAttribute('x', mx - 26); fo.setAttribute('y', my - 10);
+      fo.setAttribute('width', '54'); fo.setAttribute('height', '22');
+      fo.innerHTML = `<div xmlns="http://www.w3.org/1999/xhtml"
+        style="background:#f0faf0;border:1px solid #b8d8ba;border-radius:999px;
+               padding:1px 6px;font-size:9.5px;font-weight:700;color:#3d5a3e;
+               text-align:center;white-space:nowrap">
+        +${Math.abs(Number(delta)||0).toFixed(0)} poin
+      </div>`;
+      svg.appendChild(fo);
+    }
+  });
+
+  // Titik jangkar di cluster
+  const anchor = mkSVG('circle');
+  anchor.setAttribute('cx', clusterX); anchor.setAttribute('cy', clusterY);
+  anchor.setAttribute('r', '5'); anchor.setAttribute('fill', 'var(--amber)');
+  svg.appendChild(anchor);
+
+  /* ── Render HTML nodes ───────────────────────────────── */
+  const nodesEl = document.getElementById('map-nodes');
+  nodesEl.innerHTML = '';
+
+  // ── Node kiri: cluster buku yang sudah dibaca ─────────
+  // Tampilkan max 5 buku terbaru dalam cluster, sisanya "+N lainnya"
+  const recentBooks  = sourceBooks.slice(-5);
+  const hiddenCount  = sourceBooks.length > 5 ? sourceBooks.length - 5 : 0;
+  const avgScore     = sourceBooks.length
+    ? (sourceBooks.reduce((s,b)=>s+(b.complexity_score||50),0)/sourceBooks.length).toFixed(1)
+    : '–';
+  const avgLabel     = levelLabel(parseFloat(avgScore));
+  const cc           = cCls(avgLabel);
+
+  const cluster = document.createElement('div');
+  cluster.className = 'mn read';
+  cluster.id = `mn-${CLUSTER_ID}`;
+  cluster.style.cssText = `left:${clusterX}px;top:${clusterY}px;width:175px;animation-delay:0ms`;
+  cluster.innerHTML = `
+    <div class="mn-type">Sudah dibaca (${sourceBooks.length} buku)</div>
+    <div style="margin:.3rem 0;display:flex;flex-direction:column;gap:.18rem">
+      ${recentBooks.map(b=>`
+        <div style="font-size:.72rem;line-height:1.25;color:var(--ink);
+             white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
+          ${b.title.length>22?b.title.slice(0,22)+'…':b.title}
+        </div>`).join('')}
+      ${hiddenCount > 0 ? `<div style="font-size:.68rem;color:var(--fog)">+${hiddenCount} buku lainnya</div>` : ''}
+    </div>
+    <div class="mn-score b-${cc}" style="margin-top:.25rem">rata-rata ${avgScore}</div>`;
+  cluster.addEventListener('click', () => showClusterDetail(sourceBooks));
+  nodesEl.appendChild(cluster);
+
+  // ── Node kanan: rekomendasi ───────────────────────────
+  recNodes.forEach((n, idx) => {
+    const p   = recPos[n.node_id];
+    const ncc = cCls(n.label);
+    const div = document.createElement('div');
+    div.className = 'mn rec';
+    div.id = `mn-${n.node_id}`;
+    div.style.cssText = `left:${p.x}px;top:${p.y}px;animation-delay:${(idx+1)*70}ms`;
+    div.innerHTML = `
+      <div class="mn-type">Rekomendasi</div>
+      <div class="mn-title">${n.title}</div>
+      <div class="mn-score b-${ncc}">${n.score}</div>`;
+    div.addEventListener('click', () => selectNode(n.node_id));
+    nodesEl.appendChild(div);
+  });
+
+  resetTransform();
+  setupPanZoom(wrap);
+}
+
+// Klik cluster → tampilkan daftar semua buku yang dibaca di panel detail
+function showClusterDetail(books) {
+  document.querySelectorAll('.mn').forEach(n => n.classList.remove('selected'));
+  const el = document.getElementById(`mn-cluster-read`);
+  if (el) el.classList.add('selected');
+
+  const panel = document.getElementById('map-detail');
+  panel.classList.add('show');
+
+  const avg = books.length
+    ? (books.reduce((s,b)=>s+(b.complexity_score||50),0)/books.length).toFixed(1)
+    : '–';
+
+  panel.innerHTML = `
+    <div>
+      <div class="md-title">Daftar Buku yang Sudah Dibaca</div>
+      <div class="md-author" style="margin-bottom:.8rem">
+        ${books.length} buku · rata-rata skor: <b>${avg}</b> (${levelLabel(parseFloat(avg))})
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.5rem;max-height:200px;overflow-y:auto">
+        ${books.map((b,i)=>{
+          const bc = cCls(b.complexity_label||levelLabel(b.complexity_score||50));
+          return `<div style="display:flex;align-items:center;gap:.5rem;
+            padding:.4rem .6rem;background:var(--cream);border-radius:var(--r-sm)">
+            <span style="font-size:.7rem;color:var(--fog);flex-shrink:0;width:16px">${i+1}</span>
+            <span style="font-size:.78rem;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"
+                  title="${b.title}">${b.title}</span>
+            <span class="c-badge b-${bc}" style="font-size:.68rem;padding:.05rem .35rem;flex-shrink:0">${b.complexity_score||'–'}</span>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`;
+}
+
+function mkSVG(tag) {
+  return document.createElementNS('http://www.w3.org/2000/svg', tag);
+}
+
+/* ── Node selection → tampilkan detail ────────────────── */
+async function selectNode(nodeId) {
+  // Highlight
+  document.querySelectorAll('.mn').forEach(n => n.classList.remove('selected'));
+  const el = document.getElementById(`mn-${nodeId}`);
+  if (el) el.classList.add('selected');
+
+  // Cari data buku dari state
+  const node = S.allNodes.find(n => n.node_id === nodeId);
+  if (!node) return;
+  const book = S.allBooks.find(b => b.book_id === node.book_id);
+  if (!book) return;
+
+  // Tampilkan dulu dengan data yang ada (summary_short)
+  renderMapDetail(book, node.type);
+
+  // Fetch sinopsis penuh dari API di background, lalu update panel
+  try {
+    const r = await fetch(`${API}/api/books/${node.book_id}`);
+    const d = await r.json();
+    if (d.data?.book?.summary_full) {
+      // Gabungkan data lengkap lalu render ulang
+      renderMapDetail({ ...book, summary_full: d.data.book.summary_full }, node.type);
+    }
+  } catch { /* Tidak masalah, summary_short sudah tampil */ }
+}
+
+function renderMapDetail(b, type) {
+  const panel = document.getElementById('map-detail');
+  panel.classList.add('show');
+
+  // Tentukan apakah sinopsis perlu dipotong
+  const full  = b.summary_full || b.summary_short || '—';
+  const short = full.length > 180 ? full.slice(0, 180).trimEnd() + '…' : full;
+  const needsExpand = full.length > 180;
+  const summaryId   = `summary-${b.book_id}`;
+  const btnId       = `expand-btn-${b.book_id}`;
+
+  panel.innerHTML = `
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-wrap:wrap">
+      <div style="flex:1;min-width:200px">
+        ${tagsHTML(b)}
+        <div class="md-title">${b.title}</div>
+        <div class="md-author">✍️ ${b.author||'—'}</div>
+        ${barHTML(b.complexity_score, b.complexity_label)}
+        ${b.complexity_delta != null
+          ? `<div style="margin-top:.4rem"><span class="delta-pill">↑ +${Math.abs(b.complexity_delta).toFixed(1)} poin lebih sulit dari buku sebelumnya</span></div>`
+          : ''}
+        ${b.roadmap_step ? `<div style="font-size:.75rem;color:var(--fog);margin-top:.35rem">🗺️ ${b.roadmap_step}</div>` : ''}
+      </div>
+      <div class="md-summary" style="flex:1;min-width:200px">
+        <div class="md-sum-lbl">Sinopsis</div>
+        <span id="${summaryId}">${short}</span>${needsExpand ? `
+        <button id="${btnId}" onclick="toggleSummary('${summaryId}','${btnId}',\`${full.replace(/`/g,'\\`')}\`)"
+          style="display:inline;background:none;border:none;cursor:pointer;
+                 color:var(--amber);font-size:.82rem;font-weight:500;
+                 padding:0 0 0 .3rem;font-family:'DM Sans',sans-serif">
+          Selengkapnya
+        </button>` : ''}
+      </div>
+    </div>`;
+}
+
+function toggleSummary(spanId, btnId, fullText) {
+  const span = document.getElementById(spanId);
+  const btn  = document.getElementById(btnId);
+  if (!span || !btn) return;
+  const isExpanded = btn.textContent.trim() === 'Sembunyikan';
+  span.textContent = isExpanded
+    ? fullText.slice(0, 180).trimEnd() + '…'
+    : fullText;
+  btn.textContent  = isExpanded ? 'Selengkapnya' : 'Sembunyikan';
+}
+
+/* ══════════════════════════════════════════════════════════
+   PAN & ZOOM
+══════════════════════════════════════════════════════════ */
+function applyTransform() {
+  const t = `translate(${S.mapOX}px,${S.mapOY}px) scale(${S.mapScale})`;
+  const origin = '0 0';
+  const svg    = document.getElementById('map-svg');
+  const nodes  = document.getElementById('map-nodes');
+  svg.style.transformOrigin = nodes.style.transformOrigin = origin;
+  svg.style.transform = nodes.style.transform = t;
+}
+function resetTransform() {
+  S.mapScale=1; S.mapOX=0; S.mapOY=0; applyTransform();
+}
+function mapZoom(f) {
+  S.mapScale = Math.max(.35, Math.min(2.6, S.mapScale * f));
+  applyTransform();
+}
+function mapReset() { resetTransform(); }
+
+function setupPanZoom(wrap) {
+  wrap.addEventListener('mousedown', e => {
+    if (e.target.classList.contains('mc-btn')) return;
+    S.dragging = true;
+    S.dragStart = { x: e.clientX - S.mapOX, y: e.clientY - S.mapOY };
+  });
+  window.addEventListener('mousemove', e => {
+    if (!S.dragging) return;
+    S.mapOX = e.clientX - S.dragStart.x;
+    S.mapOY = e.clientY - S.dragStart.y;
+    applyTransform();
+  });
+  window.addEventListener('mouseup', () => { S.dragging = false; });
+  wrap.addEventListener('wheel', e => {
+    e.preventDefault();
+    mapZoom(e.deltaY > 0 ? 0.88 : 1.12);
+  }, {passive:false});
+}
+
+/* ══════════════════════════════════════════════════════════
+   PROFIL PAGE
+══════════════════════════════════════════════════════════ */
+
+// Level thresholds: [min_score, max_score, label, icon]
+const LEVELS = [
+  [0,  20,  'Sangat Mudah', '🌱'],
+  [20, 40,  'Mudah',        '📗'],
+  [40, 60,  'Menengah',     '📘'],
+  [60, 80,  'Sulit',        '📙'],
+  [80, 100, 'Sangat Sulit', '🏆'],
+];
+
+function getCurrentLevel(score) {
+  return LEVELS.find(([lo, hi]) => score >= lo && score < hi) || LEVELS[LEVELS.length - 1];
+}
+function getNextLevel(score) {
+  const idx = LEVELS.findIndex(([lo, hi]) => score >= lo && score < hi);
+  return idx < LEVELS.length - 1 ? LEVELS[idx + 1] : null;
+}
+
+function renderProfil() {
+  const books = S.books;
+  const n     = books.length;
+
+  // ── Header ────────────────────────────────────────────
+  const avg = n ? books.reduce((s, b) => s + (b.complexity_score || 50), 0) / n : 0;
+  const [,, curLbl, curIcon] = getCurrentLevel(avg);
+  document.getElementById('profil-avatar').textContent = curIcon;
+  document.getElementById('profil-name').textContent   = 'Pembaca Literasi';
+  document.getElementById('profil-sub').textContent    =
+    `${n} buku dibaca · Level: ${curLbl}`;
+
+  // ── Stat cards ─────────────────────────────────────────
+  document.getElementById('st-total').textContent    = n;
+  document.getElementById('st-avg').textContent      = n ? avg.toFixed(1) : '–';
+  document.getElementById('st-avg-lbl').textContent  = n ? curLbl : 'belum ada buku';
+
+  // Genre favorit (dari semua genre buku yang dibaca)
+  const genreCounts = {};
+  books.forEach(b => {
+    const genres = (b.genre_list || (b.genre || '').split('|'));
+    genres.forEach(g => {
+      g = g.trim();
+      if (g) genreCounts[g] = (genreCounts[g] || 0) + 1;
+    });
+  });
+  const topGenres = Object.entries(genreCounts).sort((a,b) => b[1]-a[1]);
+  document.getElementById('st-genre').textContent = topGenres.length
+    ? topGenres[0][0]
+    : '–';
+
+  // ── Progress bar level ──────────────────────────────────
+  const [curLo, curHi] = getCurrentLevel(avg);
+  const nextLvl = getNextLevel(avg);
+  const pct = n
+    ? Math.min(100, Math.round(((avg - curLo) / (curHi - curLo)) * 100))
+    : 0;
+
+  document.getElementById('lp-fill').style.width = pct + '%';
+  document.getElementById('lp-pct').textContent  = pct + '%';
+  document.getElementById('lp-cur-lbl').textContent  = curLbl + ` (${curLo}–${curHi})`;
+  document.getElementById('lp-next-lbl').textContent = nextLvl
+    ? nextLvl[2] + ` (${nextLvl[0]}–${nextLvl[1]})`
+    : '🏆 Level tertinggi';
+
+  const remaining = nextLvl ? (nextLvl[0] - avg).toFixed(1) : 0;
+  document.getElementById('lp-milestone').innerHTML = n && nextLvl
+    ? `Butuh <b>+${remaining} poin</b> lagi untuk mencapai level <b>${nextLvl[2]}</b>`
+    : n
+      ? `Kamu sudah di level tertinggi! 🏆`
+      : `Tambahkan buku untuk melihat progress`;
+
+  // ── Genre chart ─────────────────────────────────────────
+  const chartEl = document.getElementById('genre-chart');
+  if (!topGenres.length) {
+    chartEl.innerHTML = '<div class="lib-empty">Belum ada data genre</div>';
+  } else {
+    const maxCount = topGenres[0][1];
+    chartEl.innerHTML = topGenres.slice(0, 7).map(([g, cnt]) => `
+      <div class="genre-row">
+        <span class="genre-name" title="${g}">${g}</span>
+        <div class="genre-bar-t">
+          <div class="genre-bar-f" style="width:${Math.round(cnt/maxCount*100)}%"></div>
+        </div>
+        <span class="genre-count">${cnt}</span>
+      </div>`).join('');
+  }
+
+  // ── Panduan level ────────────────────────────────────────
+  document.getElementById('level-guide').innerHTML = LEVELS.map(([lo, hi, lbl, icon]) => {
+    const active = avg >= lo && avg < hi && n > 0;
+    return `<div style="display:flex;align-items:center;gap:.7rem;padding:.45rem .6rem;
+      border-radius:var(--r-sm);background:${active?'var(--cream)':'transparent'};
+      border:1px solid ${active?'var(--fog-lt)':'transparent'}">
+      <span style="font-size:1rem">${icon}</span>
+      <div style="flex:1">
+        <div style="font-size:.82rem;font-weight:${active?'500':'400'};color:var(--ink)">${lbl}</div>
+        <div style="font-size:.72rem;color:var(--fog)">Skor ${lo}–${hi}</div>
+      </div>
+      ${active ? `<span style="font-size:.7rem;background:var(--amber);color:var(--white);
+        border-radius:999px;padding:.1rem .5rem;font-weight:500">Kamu di sini</span>` : ''}
+    </div>`;
+  }).join('');
+
+  // ── Perpustakaan ─────────────────────────────────────────
+  renderLibrary('');
+}
+
+function renderLibrary(query) {
+  const el    = document.getElementById('lib-list');
+  const books = S.books.filter(b =>
+    !query || b.title.toLowerCase().includes(query.toLowerCase()) ||
+    (b.author || '').toLowerCase().includes(query.toLowerCase())
+  );
+
+  if (!books.length) {
+    el.innerHTML = query
+      ? `<div class="lib-empty">Tidak ada buku yang cocok dengan "${query}"</div>`
+      : `<div class="lib-empty">Belum ada buku. Tambahkan dari halaman Beranda.</div>`;
+    return;
+  }
+
+  el.innerHTML = books.map((b, i) => {
+    const cc  = cCls(b.complexity_label || levelLabel(b.complexity_score || 50));
+    return `
+    <div class="lib-item">
+      <div class="lib-num">${i + 1}</div>
+      <div class="lib-info">
+        <div class="lib-title" title="${b.title}">${b.title}</div>
+        <div class="lib-author">${b.author || '—'}</div>
+      </div>
+      <div class="lib-right">
+        <div style="text-align:right">
+          <span class="lib-score c-badge b-${cc}">${b.complexity_score || '–'}</span>
+          <span class="lib-score-lbl">${b.complexity_label || ''}</span>
+        </div>
+        <button class="lib-remove" onclick="removeFromLib(${b.book_id})" title="Hapus dari daftar">×</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function filterLibrary(q) { renderLibrary(q); }
+
+function removeFromLib(id) {
+  removeBook(id);      // fungsi yang sudah ada di home
+  renderProfil();      // update tampilan profil
+}
+
+/* ── Patch showPage agar render profil saat dibuka ── */
+const _origShowPage = showPage;
+showPage = function(id) {
+  _origShowPage(id);
+  if (id === 'profil') renderProfil();
+};
+
+/* ══════════════════════════════════════════════════════════
+   INIT
+══════════════════════════════════════════════════════════ */
+(async function init() {
+  try {
+    const r = await fetch(`${API}/api/health`);
+    const d = await r.json();
+    if (d.status === 'success')
+      toast(`✓ Terhubung — ${(d.data.total_books||0).toLocaleString('id')} buku tersedia`);
+  } catch {
+    toast('⚠️ API tidak terhubung. Jalankan step4_api.py terlebih dahulu.', 4500);
+  }
+})();
+</script>
+</body>
+</html>

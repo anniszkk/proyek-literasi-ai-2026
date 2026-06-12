@@ -1,0 +1,4252 @@
+File cleaning.py
+import pandas as pd
+import re
+
+file_path = "data/raw/gramedia_scraped.csv"
+
+print("[INFO] Membaca file CSV...")
+df = pd.read_csv(file_path)
+
+def bersihkan_sisa_teks(teks):
+    if pd.isna(teks):
+        return teks
+        
+    teks = str(teks)
+    # 1. Jika ada minimal 3 bintang, potong teks di posisi tersebut
+    if "***" in teks:
+        teks = teks.split("***")[0]
+        
+    # 2. Hapus sisa bintang, strip (-), atau spasi yang nyangkut di akhir kalimat
+    teks = re.sub(r'[\*\-\s]+$', '', teks)
+    return teks.strip()
+
+print("[INFO] Membersihkan kolom sinopsis...")
+df['summary'] = df['summary'].apply(bersihkan_sisa_teks)
+
+# Simpan kembali
+df.to_csv(file_path, index=False, encoding="utf-8-sig")
+print("[SELESAI] Tanda bintang berhasil dibasmi dari dataset!")
+
+File index.html
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Book Diary — Leveling Up Your Reading Journey</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --ink:#3d2535; --paper:#fff8fa; --cream:#fdeef3;
+  --rose:#e8799a; --rose-lt:#f0a0b8; --rose-dk:#c45c7a;
+  --blush:#fce4ec; --blush-lt:#fff0f4;
+  --teal:#4a8c7e; --teal-lt:#5eaa9a;
+  --fog:#9e8590; --fog-lt:#d9c4cb; --white:#fffbfd;
+  --r-sm:6px; --r-md:12px; --r-lg:20px;
+  --shadow-sm:0 1px 4px rgba(61,37,53,.08);
+  --shadow-md:0 4px 16px rgba(61,37,53,.10);
+  --shadow-lg:0 12px 40px rgba(61,37,53,.14);
+  --ease:cubic-bezier(.4,0,.2,1);
+  --amber:var(--rose); --amber-lt:var(--rose-lt);
+  --moss:var(--teal); --moss-lt:var(--teal-lt);
+}
+html { scroll-behavior:smooth; }
+body {
+  font-family:'DM Sans',sans-serif;
+  background:var(--paper); color:var(--ink);
+  min-height:100vh; overflow-x:hidden;
+}
+/* Ganti semua Instrument Serif → Playfair Display */
+.logo, .section-title, .hero h1,
+.card-title, .modal-title, .detail-book-title,
+.md-title, .lib-title, .profil-name,
+.stat-val, .lc-score, .mn-title,
+.level-big { font-family:'Playfair Display',serif !important; }
+body::before {
+  content:''; position:fixed; inset:0; pointer-events:none; z-index:9999;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.035'/%3E%3C/svg%3E");
+}
+
+/* ── HEADER ── */
+header {
+  background:var(--blush); color:var(--ink);
+  padding:0 2rem; display:flex; align-items:center; justify-content:space-between;
+  height:60px; position:sticky; top:0; z-index:100;
+  box-shadow:0 1px 0 rgba(228,121,154,.25), var(--shadow-sm);
+  border-bottom:1px solid rgba(232,121,154,.2);
+}
+.logo {
+  font-family:'Instrument Serif',serif; font-size:1.3rem;
+  display:flex; align-items:center; gap:.5rem; cursor:pointer;
+}
+.logo-dot { width:8px; height:8px; border-radius:50%; background:var(--rose); }
+nav { display:flex; gap:.25rem; }
+nav button {
+  background:none; border:none; color:var(--fog);
+  font-family:'DM Sans',sans-serif; font-size:.82rem; font-weight:500;
+  padding:.45rem .85rem; border-radius:var(--r-sm); cursor:pointer;
+  transition:all .2s; letter-spacing:.04em; text-transform:uppercase;
+}
+nav button:hover { background:rgba(232,121,154,.15); color:var(--ink); }
+nav button.active { background:var(--rose); color:var(--white); }
+
+/* ── PAGES ── */
+main { max-width:1160px; margin:0 auto; padding:2rem 1.5rem 5rem; }
+.page { display:none; }
+.page.active { display:block; animation:fadeUp .3s var(--ease); }
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(10px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+/* ── SECTION TITLE ── */
+.section-title {
+  font-family:'Playfair Display',serif; font-size:1.7rem; font-weight:400;
+  margin-bottom:1.4rem; line-height:1.2;
+}
+.section-title span { color:var(--rose); font-style:italic; }
+
+/* ── HERO ── */
+.hero { text-align:center; padding:3.5rem 1rem 2.5rem; }
+.hero-eyebrow {
+  font-size:.72rem; letter-spacing:.2em; text-transform:uppercase;
+  color:var(--rose); font-weight:500; margin-bottom:.9rem;
+}
+.hero h1 {
+  font-family:'Playfair Display',serif;
+  font-size:clamp(2rem,5vw,3.4rem); font-weight:400; line-height:1.1;
+  margin-bottom:.9rem;
+}
+.hero h1 em { color:var(--rose); font-style:italic; }
+.hero p {
+  color:var(--fog); font-size:1rem; max-width:500px;
+  margin:0 auto 2rem; line-height:1.75;
+}
+
+/* ── BADGE LEVEL ── */
+.badge-level {
+  display:inline-flex; align-items:center; gap:.55rem;
+  background:var(--cream); border:1px solid var(--fog-lt);
+  border-radius:999px; padding:.45rem 1.1rem;
+  font-size:.83rem; font-weight:500; margin-bottom:1.8rem;
+}
+.badge-level .lbl { color:var(--fog); font-size:.75rem; }
+
+/* ── SEARCH WRAP ── */
+.search-wrap { position:relative; max-width:500px; margin:0 auto .8rem; }
+.search-wrap input {
+  width:100%; background:var(--white); border:1.5px solid var(--fog-lt);
+  border-radius:var(--r-lg); padding:.8rem 3rem .8rem 1.1rem;
+  font-family:'DM Sans',sans-serif; font-size:.95rem; color:var(--ink);
+  outline:none; transition:border-color .2s; box-shadow:var(--shadow-sm);
+}
+.search-wrap input:focus { border-color:var(--amber); }
+.search-wrap input::placeholder { color:var(--fog-lt); }
+.search-btn {
+  position:absolute; right:.45rem; top:50%; transform:translateY(-50%);
+  background:var(--amber); color:var(--white); border:none;
+  border-radius:var(--r-md); padding:.42rem .85rem;
+  font-size:.82rem; font-weight:500; cursor:pointer; transition:background .2s;
+}
+.search-btn:hover { background:var(--amber-lt); }
+
+/* ── AUTOCOMPLETE ── */
+.ac-list {
+  position:absolute; top:calc(100% + 5px); left:0; right:0;
+  background:var(--white); border:1.5px solid var(--fog-lt);
+  border-radius:var(--r-md); box-shadow:var(--shadow-lg);
+  z-index:300; max-height:260px; overflow-y:auto; display:none;
+}
+.ac-list.open { display:block; }
+.ac-item {
+  padding:.65rem 1rem; cursor:pointer;
+  border-bottom:1px solid var(--cream); transition:background .12s;
+}
+.ac-item:last-child { border-bottom:none; }
+.ac-item:hover { background:var(--cream); }
+.ac-t { font-size:.88rem; font-weight:500; }
+.ac-a { font-size:.75rem; color:var(--fog); }
+
+/* ── READ CHIPS ── */
+.read-list {
+  display:flex; flex-wrap:wrap; gap:.45rem;
+  justify-content:center; margin:.8rem auto 1.2rem;
+  max-width:600px; min-height:38px;
+}
+.read-chip {
+  display:inline-flex; align-items:center; gap:.35rem;
+  background:var(--ink); color:var(--white);
+  border-radius:999px; padding:.3rem .8rem;
+  font-size:.8rem; font-weight:500;
+  animation:popIn .2s var(--ease);
+}
+@keyframes popIn { from{opacity:0;transform:scale(.75)} to{opacity:1;transform:scale(1)} }
+.read-chip button {
+  background:none; border:none; color:rgba(255,255,255,.5);
+  cursor:pointer; font-size:.95rem; line-height:1; transition:color .15s;
+}
+.read-chip button:hover { color:var(--white); }
+
+/* ── CTA BUTTON ── */
+.cta-btn {
+  background:var(--moss); color:var(--white); border:none;
+  border-radius:var(--r-md); padding:.75rem 1.9rem;
+  font-family:'DM Sans',sans-serif; font-size:.92rem; font-weight:500;
+  cursor:pointer; transition:all .2s; box-shadow:var(--shadow-sm);
+  letter-spacing:.02em;
+}
+.cta-btn:hover { background:var(--moss-lt); transform:translateY(-1px); box-shadow:var(--shadow-md); }
+.cta-btn:disabled { background:var(--fog-lt); cursor:not-allowed; transform:none; }
+
+/* ── CARDS ── */
+.card {
+  background:var(--white); border:1px solid var(--fog-lt);
+  border-radius:var(--r-lg); padding:1.1rem 1.3rem;
+  box-shadow:var(--shadow-sm); transition:all .2s var(--ease);
+}
+.card:hover { box-shadow:var(--shadow-md); transform:translateY(-2px); }
+.card-title {
+  font-family:'Instrument Serif',serif; font-size:1rem;
+  font-weight:400; color:var(--ink); margin-bottom:.2rem; line-height:1.3;
+}
+.card-author { font-size:.78rem; color:var(--fog); margin-bottom:.55rem; }
+.card-summary { font-size:.8rem; color:var(--fog); line-height:1.65; margin-top:.5rem; }
+
+/* ── TAGS ── */
+.tags { display:flex; flex-wrap:wrap; gap:.3rem; margin-bottom:.6rem; }
+.tag { font-size:.7rem; font-weight:500; padding:.18rem .55rem; border-radius:999px; }
+.tag-genre { background:var(--cream); color:var(--fog); border:1px solid var(--fog-lt); }
+.tag-id { background:#e8f4ea; color:var(--moss); border:1px solid #b8d8ba; }
+.tag-en { background:#e8eef8; color:#3a5a8a; border:1px solid #b8c8e8; }
+
+/* ── COMPLEXITY BAR ── */
+.cw { margin:.5rem 0; }
+.cw-row { display:flex; justify-content:space-between; font-size:.73rem; color:var(--fog); margin-bottom:.28rem; }
+.c-badge { font-weight:600; font-size:.78rem; padding:.08rem .45rem; border-radius:999px; }
+.bar-t { height:5px; background:var(--cream); border-radius:999px; overflow:hidden; }
+.bar-f { height:100%; border-radius:999px; transition:width .6s var(--ease); }
+.c-sangat-mudah { background:#4CAF50; }
+.c-mudah        { background:#8BC34A; }
+.c-menengah     { background:#FFC107; }
+.c-sulit        { background:#FF9800; }
+.c-sangat-sulit { background:#F44336; }
+.b-sangat-mudah { background:#e8f5e9; color:#2e7d32; }
+.b-mudah        { background:#f1f8e9; color:#558b2f; }
+.b-menengah     { background:#fff8e1; color:#f57f17; }
+.b-sulit        { background:#fff3e0; color:#e65100; }
+.b-sangat-sulit { background:#fbe9e7; color:#bf360c; }
+
+/* ── SEARCH RESULTS GRID ── */
+.search-grid {
+  display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+  gap:1rem; margin-top:1.4rem;
+}
+.search-card {
+  background:var(--white); border:1px solid var(--fog-lt);
+  border-radius:var(--r-lg); padding:1.1rem 1.3rem;
+  box-shadow:var(--shadow-sm); transition:all .2s var(--ease);
+  cursor:pointer;
+}
+.search-card:hover { box-shadow:var(--shadow-md); transform:translateY(-2px); border-color:var(--amber); }
+
+/* ── MODAL (detail buku) ── */
+.modal-overlay {
+  position:fixed; inset:0; background:rgba(26,22,18,.5);
+  z-index:500; display:none; align-items:center; justify-content:center;
+  padding:1rem;
+  backdrop-filter:blur(3px);
+}
+.modal-overlay.open { display:flex; animation:fadeIn .2s var(--ease); }
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+.modal {
+  background:var(--white); border-radius:var(--r-lg);
+  padding:2rem; max-width:540px; width:100%;
+  box-shadow:var(--shadow-lg); position:relative;
+  max-height:85vh; overflow-y:auto;
+  animation:modalIn .25s var(--ease);
+}
+@keyframes modalIn { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+.modal-close {
+  position:absolute; top:1rem; right:1rem;
+  background:var(--cream); border:none; border-radius:var(--r-sm);
+  width:30px; height:30px; cursor:pointer; font-size:1rem;
+  display:flex; align-items:center; justify-content:center;
+  color:var(--fog); transition:all .15s;
+}
+.modal-close:hover { background:var(--fog-lt); color:var(--ink); }
+.modal-title {
+  font-family:'Instrument Serif',serif; font-size:1.5rem;
+  font-weight:400; margin-bottom:.25rem; line-height:1.25;
+  padding-right:2rem;
+}
+.modal-author { font-size:.85rem; color:var(--fog); margin-bottom:1rem; }
+.modal-summary {
+  font-size:.88rem; line-height:1.75; color:var(--fog);
+  border-top:1px solid var(--cream); padding-top:.9rem; margin-top:.9rem;
+}
+.modal-summary-lbl {
+  font-size:.7rem; text-transform:uppercase; letter-spacing:.12em;
+  color:var(--fog-lt); margin-bottom:.4rem; font-weight:500;
+}
+.modal-add-btn {
+  margin-top:1.2rem; width:100%;
+  background:var(--moss); color:var(--white); border:none;
+  border-radius:var(--r-md); padding:.7rem; font-size:.88rem;
+  font-weight:500; cursor:pointer; font-family:'DM Sans',sans-serif;
+  transition:background .2s;
+}
+.modal-add-btn:hover { background:var(--moss-lt); }
+.modal-add-btn.added { background:var(--fog-lt); cursor:default; }
+
+/* ══════════════════════════════════════════════════════════
+   ROADMAP PAGE
+══════════════════════════════════════════════════════════ */
+.rm-layout {
+  display:grid; grid-template-columns:200px 1fr; gap:1.2rem; align-items:start;
+}
+@media(max-width:700px) { .rm-layout { grid-template-columns:1fr; } }
+
+/* Level sidebar */
+.level-card {
+  background:var(--ink); color:var(--white);
+  border-radius:var(--r-lg); padding:1.1rem 1.2rem; margin-bottom:.9rem;
+}
+.lc-eyebrow {
+  font-size:.68rem; text-transform:uppercase; letter-spacing:.14em;
+  color:rgba(255,255,255,.4); margin-bottom:.5rem;
+}
+.lc-score {
+  font-family:'Instrument Serif',serif; font-size:2.4rem; font-weight:400; line-height:1;
+}
+.lc-label { font-size:.8rem; color:rgba(255,255,255,.55); margin-top:.3rem; }
+.lc-bar-t { height:3px; background:rgba(255,255,255,.12); border-radius:999px; margin-top:.8rem; overflow:hidden; }
+.lc-bar-f { height:100%; border-radius:999px; background:var(--amber); transition:width .8s var(--ease); }
+
+.target-card {
+  background:var(--cream); border:1px solid var(--fog-lt);
+  border-radius:var(--r-md); padding:.8rem 1rem;
+}
+.target-card .tc-lbl { font-size:.68rem; text-transform:uppercase; letter-spacing:.1em; color:var(--fog-lt); margin-bottom:.3rem; }
+.target-card .tc-val { font-size:.85rem; color:var(--ink); font-weight:500; }
+
+/* ══════════════════════════════════════════════════════════
+   MIND MAP  (pure SVG + HTML overlay)
+══════════════════════════════════════════════════════════ */
+#map-wrap {
+  position:relative; background:var(--white);
+  border:1px solid var(--fog-lt); border-radius:var(--r-lg);
+  box-shadow:var(--shadow-sm); overflow:hidden;
+  height:520px; cursor:grab;
+}
+#map-wrap:active { cursor:grabbing; }
+
+/* SVG layer (edges) */
+#map-svg { position:absolute; inset:0; width:100%; height:100%; overflow:visible; }
+
+/* Nodes HTML overlay */
+#map-nodes { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; }
+
+/* Individual node */
+.mn {
+  position:absolute; transform:translate(-50%,-50%);
+  pointer-events:all; cursor:pointer;
+  background:var(--white); border:2px solid var(--fog-lt);
+  border-radius:14px; padding:.55rem .75rem;
+  box-shadow:var(--shadow-sm); width:150px; text-align:center;
+  transition:box-shadow .2s, border-color .2s, transform .15s;
+  animation:nodeIn .35s var(--ease) both;
+  user-select:none;
+}
+.mn:hover { box-shadow:var(--shadow-md); transform:translate(-50%,-50%) scale(1.04); z-index:10; }
+.mn.read { border-color:var(--amber); background:#fffbf5; }
+.mn.rec  { border-color:var(--moss-lt); background:#f5fbf5; }
+.mn.selected { border-color:var(--ink); box-shadow:0 0 0 3px rgba(26,22,18,.15),var(--shadow-md); z-index:20; }
+@keyframes nodeIn {
+  from { opacity:0; transform:translate(-50%,-50%) scale(.65); }
+  to   { opacity:1; transform:translate(-50%,-50%) scale(1); }
+}
+.mn-type { font-size:.6rem; text-transform:uppercase; letter-spacing:.1em; color:var(--fog-lt); margin-bottom:.2rem; }
+.mn-title {
+  font-family:'Instrument Serif',serif; font-size:.82rem; line-height:1.3;
+  display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
+}
+.mn-score {
+  display:inline-block; margin-top:.3rem;
+  font-size:.68rem; font-weight:600;
+  padding:.1rem .4rem; border-radius:999px;
+}
+
+/* Map controls */
+.map-ctrls {
+  position:absolute; bottom:.9rem; right:.9rem;
+  display:flex; flex-direction:column; gap:.35rem; z-index:30;
+}
+.mc-btn {
+  width:30px; height:30px; background:var(--white); border:1px solid var(--fog-lt);
+  border-radius:var(--r-sm); cursor:pointer; font-size:.95rem;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow:var(--shadow-sm); transition:background .15s; color:var(--ink);
+}
+.mc-btn:hover { background:var(--cream); }
+
+/* Legend */
+.map-legend {
+  position:absolute; top:.75rem; left:.75rem;
+  display:flex; gap:.5rem; z-index:30;
+}
+.ml-item {
+  display:flex; align-items:center; gap:.3rem;
+  background:rgba(253,250,244,.92); border:1px solid var(--fog-lt);
+  border-radius:var(--r-sm); padding:.18rem .5rem; font-size:.7rem; color:var(--fog);
+}
+.ml-dot { width:9px; height:9px; border-radius:3px; flex-shrink:0; }
+
+/* Map detail panel bawah */
+#map-detail {
+  background:var(--white); border:1px solid var(--fog-lt);
+  border-radius:var(--r-lg); padding:1.2rem 1.4rem;
+  margin-top:1rem; box-shadow:var(--shadow-sm);
+  display:none;
+  animation:fadeUp .25s var(--ease);
+}
+#map-detail.show { display:block; }
+.md-title { font-family:'Instrument Serif',serif; font-size:1.25rem; font-weight:400; margin-bottom:.2rem; }
+.md-author { font-size:.82rem; color:var(--fog); margin-bottom:.7rem; }
+.md-summary { font-size:.83rem; color:var(--fog); line-height:1.7; margin-top:.8rem; border-top:1px solid var(--cream); padding-top:.8rem; }
+.md-sum-lbl { font-size:.68rem; text-transform:uppercase; letter-spacing:.12em; color:var(--fog-lt); margin-bottom:.35rem; }
+.delta-pill {
+  display:inline-flex; align-items:center; gap:.25rem;
+  background:#e8f4ea; color:var(--moss); border:1px solid #b8d8ba;
+  border-radius:999px; padding:.15rem .55rem; font-size:.73rem; font-weight:600;
+}
+
+/* ── LOADING / EMPTY ── */
+.loading-box { display:flex; align-items:center; justify-content:center; gap:.55rem; color:var(--fog); font-size:.88rem; padding:3rem; }
+.spinner { width:18px; height:18px; border:2px solid var(--fog-lt); border-top-color:var(--amber); border-radius:50%; animation:spin .65s linear infinite; }
+@keyframes spin { to{ transform:rotate(360deg); } }
+.empty-state { text-align:center; padding:3rem 1rem; color:var(--fog); }
+.empty-state .ei { font-size:2.2rem; margin-bottom:.7rem; opacity:.4; }
+.empty-state p { font-size:.88rem; line-height:1.75; }
+
+/* ── PROFIL PAGE ── */
+.profil-header {
+  display:flex; align-items:center; gap:1.2rem; margin-bottom:2rem;
+  padding-bottom:1.5rem; border-bottom:1px solid var(--fog-lt);
+}
+.avatar {
+  width:56px; height:56px; border-radius:50%;
+  background:var(--ink); color:var(--white);
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Instrument Serif',serif; font-size:1.4rem; flex-shrink:0;
+}
+.profil-name { font-family:'Instrument Serif',serif; font-size:1.4rem; font-weight:400; }
+.profil-sub  { font-size:.82rem; color:var(--fog); margin-top:.2rem; }
+.stat-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:.8rem; margin-bottom:2rem; }
+.stat-card {
+  background:var(--white); border:1px solid var(--fog-lt);
+  border-radius:var(--r-md); padding:.9rem 1rem;
+}
+.stat-lbl { font-size:.7rem; text-transform:uppercase; letter-spacing:.1em; color:var(--fog-lt); margin-bottom:.35rem; }
+.stat-val { font-family:'Instrument Serif',serif; font-size:1.6rem; font-weight:400; line-height:1; }
+.stat-sub { font-size:.75rem; color:var(--fog); margin-top:.25rem; }
+.level-progress-wrap {
+  background:var(--white); border:1px solid var(--fog-lt);
+  border-radius:var(--r-lg); padding:1.2rem 1.4rem; margin-bottom:2rem;
+}
+.lp-header { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:.6rem; }
+.lp-title  { font-size:.88rem; font-weight:500; }
+.lp-pct    { font-size:.78rem; color:var(--fog); }
+.lp-track  { height:8px; background:var(--cream); border-radius:999px; overflow:hidden; margin-bottom:.5rem; }
+.lp-fill   { height:100%; border-radius:999px; background:var(--moss); transition:width 1s var(--ease); }
+.lp-labels { display:flex; justify-content:space-between; font-size:.72rem; color:var(--fog-lt); }
+.lp-milestone {
+  display:inline-flex; align-items:center; gap:.35rem;
+  background:var(--cream); border:1px solid var(--fog-lt);
+  border-radius:999px; padding:.22rem .65rem; font-size:.74rem; color:var(--fog); margin-top:.6rem;
+}
+.lp-milestone b { color:var(--ink); }
+.profil-two-col { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:2rem; }
+@media(max-width:640px){ .profil-two-col{ grid-template-columns:1fr; } .stat-grid{ grid-template-columns:1fr 1fr; } }
+.genre-wrap {
+  background:var(--white); border:1px solid var(--fog-lt);
+  border-radius:var(--r-lg); padding:1.2rem 1.4rem;
+}
+.genre-row { display:flex; align-items:center; gap:.7rem; margin-bottom:.55rem; }
+.genre-row:last-child { margin-bottom:0; }
+.genre-name { font-size:.8rem; color:var(--ink); width:130px; flex-shrink:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.genre-bar-t { flex:1; height:6px; background:var(--cream); border-radius:999px; overflow:hidden; }
+.genre-bar-f { height:100%; border-radius:999px; background:var(--amber); transition:width .6s var(--ease); }
+.genre-count { font-size:.74rem; color:var(--fog); width:20px; text-align:right; flex-shrink:0; }
+.profil-library {
+  background:var(--white); border:1px solid var(--fog-lt);
+  border-radius:var(--r-lg); padding:1.2rem 1.4rem;
+}
+.lib-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:1rem; flex-wrap:wrap; gap:.6rem; }
+.lib-search-wrap { position:relative; width:200px; }
+.lib-search-wrap input {
+  width:100%; background:var(--cream); border:1px solid var(--fog-lt);
+  border-radius:var(--r-md); padding:.42rem 2rem .42rem .75rem;
+  font-size:.82rem; font-family:'DM Sans',sans-serif; color:var(--ink); outline:none; transition:border-color .2s;
+}
+.lib-search-wrap input:focus { border-color:var(--amber); background:var(--white); }
+.lib-search-wrap input::placeholder { color:var(--fog-lt); }
+.lib-search-icon { position:absolute; right:.5rem; top:50%; transform:translateY(-50%); color:var(--fog-lt); font-size:.85rem; pointer-events:none; }
+.lib-empty { text-align:center; padding:2rem 1rem; color:var(--fog); font-size:.85rem; }
+.lib-item {
+  display:flex; align-items:center; gap:.8rem;
+  padding:.7rem 0; border-bottom:1px solid var(--cream);
+}
+.lib-item:last-child { border-bottom:none; padding-bottom:0; }
+.lib-num {
+  width:22px; height:22px; border-radius:50%; background:var(--cream);
+  color:var(--fog); font-size:.7rem; font-weight:500;
+  display:flex; align-items:center; justify-content:center; flex-shrink:0;
+}
+.lib-info { flex:1; min-width:0; }
+.lib-title { font-family:'Instrument Serif',serif; font-size:.93rem; line-height:1.25; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.lib-author { font-size:.74rem; color:var(--fog); margin-top:.1rem; }
+.lib-right { flex-shrink:0; text-align:right; display:flex; align-items:center; gap:.5rem; }
+.lib-score { font-size:.84rem; font-weight:600; }
+.lib-score-lbl { font-size:.66rem; color:var(--fog-lt); display:block; }
+.lib-remove {
+  background:none; border:none; color:var(--fog-lt); cursor:pointer;
+  font-size:.95rem; padding:.18rem; line-height:1; border-radius:var(--r-sm); transition:all .15s;
+}
+.lib-remove:hover { color:#8b3a2a; background:var(--cream); }
+.section-label {
+  font-size:.72rem; text-transform:uppercase; letter-spacing:.12em;
+  color:var(--fog-lt); font-weight:500; margin-bottom:.7rem;
+}
+/* ── FOOTER ── */
+footer {
+  background:var(--blush);
+  color:var(--fog);
+  margin-top:4rem;
+  padding:3rem 2rem 1.5rem;
+  border-top:1px solid rgba(232,121,154,.25);
+}
+.footer-inner {
+  max-width:1160px; margin:0 auto;
+  display:grid; grid-template-columns:2fr 1fr 1fr; gap:2.5rem;
+  padding-bottom:2rem;
+  border-bottom:1px solid rgba(232,121,154,.2);
+}
+@media(max-width:680px){
+  .footer-inner { grid-template-columns:1fr; gap:1.8rem; }
+}
+.footer-brand-name {
+  font-family:'Playfair Display',serif;
+  font-size:1.35rem; font-weight:600; color:var(--ink);
+  display:flex; align-items:center; gap:.5rem; margin-bottom:.4rem;
+}
+.footer-brand-dot {
+  width:7px; height:7px; border-radius:50%; background:var(--rose); flex-shrink:0;
+}
+.footer-tagline {
+  font-size:.78rem; letter-spacing:.12em; text-transform:uppercase;
+  color:var(--rose); margin-bottom:.9rem; font-weight:500;
+}
+.footer-desc {
+  font-size:.84rem; line-height:1.75; color:var(--fog);
+  max-width:320px;
+}
+.footer-col-title {
+  font-size:.7rem; text-transform:uppercase; letter-spacing:.14em;
+  color:var(--rose-dk); font-weight:500; margin-bottom:.8rem;
+}
+.footer-links { list-style:none; display:flex; flex-direction:column; gap:.45rem; }
+.footer-links li button {
+  background:none; border:none; cursor:pointer; padding:0;
+  font-family:'DM Sans',sans-serif; font-size:.84rem;
+  color:var(--fog); transition:color .15s; text-align:left;
+}
+.footer-links li button:hover { color:var(--ink); }
+.footer-bottom {
+  max-width:1160px; margin:1.2rem auto 0;
+  display:flex; align-items:center; justify-content:space-between;
+  flex-wrap:wrap; gap:.6rem;
+}
+.footer-copy { font-size:.75rem; color:var(--fog-lt); }
+.footer-credit { font-size:.75rem; color:var(--fog-lt); text-align:right; }
+.footer-heart { color:var(--rose); }
+
+/* ── TOAST ── */
+#toast {
+  position:fixed; bottom:1.8rem; left:50%;
+  transform:translateX(-50%) translateY(16px);
+  background:var(--ink); color:var(--white);
+  padding:.65rem 1.4rem; border-radius:var(--r-md);
+  font-size:.82rem; font-weight:500;
+  z-index:9000; opacity:0; pointer-events:none;
+  transition:opacity .25s var(--ease), transform .25s var(--ease);
+  box-shadow:var(--shadow-lg); white-space:nowrap;
+}
+#toast.show {
+  opacity:1; transform:translateX(-50%) translateY(0);
+  pointer-events:none;
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="logo" onclick="showPage('home')">
+    <div class="logo-dot"></div>Book Diary
+  </div>
+  <nav>
+    <button id="nav-home"    onclick="showPage('home')"    class="active">Beranda</button>
+    <button id="nav-search"  onclick="showPage('search')">Cari Buku</button>
+    <button id="nav-roadmap" onclick="showPage('roadmap')">Peta Jalan</button>
+    <button id="nav-profil"  onclick="showPage('profil')">Profil</button>
+  </nav>
+</header>
+
+<main>
+
+<!-- ═══════════════════════ HOME ═══════════════════════ -->
+<div class="page active" id="page-home">
+  <div class="hero">
+    <p class="hero-eyebrow">✦ Rekomendasi Bacaan Cerdas</p>
+    <h1>Bacaan yang <em>tepat</em>,<br>di waktu yang tepat.</h1>
+    <p>Masukkan buku yang sudah kamu selesaikan. AI menganalisis kompleksitasnya dan merekomendasikan buku berikutnya yang sedikit lebih menantang.</p>
+
+    <div class="badge-level" id="home-badge">
+      <span id="badge-icon">📚</span>
+      <span id="badge-label">Mulai perjalanan literasimu</span>
+      <span class="lbl">Tambahkan buku untuk melihat levelmu</span>
+    </div>
+
+    <div class="search-wrap">
+      <input type="text" id="home-input" placeholder="Ketik judul buku yang sudah dibaca…"
+             autocomplete="off" oninput="onHomeType(this.value)" onkeydown="onHomeKey(event)">
+      <button class="search-btn" onclick="addFromInput()">Tambah</button>
+      <div class="ac-list" id="home-ac"></div>
+    </div>
+
+    <div class="read-list" id="read-list"></div>
+    <br>
+    <button class="cta-btn" id="cta" onclick="goRoadmap()" disabled>Lihat Peta Jalan →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════ SEARCH ═══════════════════════ -->
+<div class="page" id="page-search">
+  <h2 class="section-title">Cari <span>Buku</span></h2>
+  <div class="search-wrap" style="max-width:460px;margin:0 0 0 0">
+    <input type="text" id="search-input" placeholder="Judul atau nama penulis…"
+           onkeydown="if(event.key==='Enter')doSearch()">
+    <button class="search-btn" onclick="doSearch()">Cari</button>
+  </div>
+  <div id="search-results" class="search-grid"></div>
+</div>
+
+<!-- ═══════════════════════ ROADMAP ═══════════════════════ -->
+<div class="page" id="page-roadmap">
+  <h2 class="section-title">Peta <span>Perjalanan</span></h2>
+
+  <div id="rm-loading" class="loading-box" style="display:none">
+    <div class="spinner"></div>Membangun peta literasimu…
+  </div>
+
+  <div id="rm-empty" class="empty-state">
+    <div class="ei">🧭</div>
+    <p>Belum ada buku yang ditambahkan.<br>
+    Kembali ke <a href="#" onclick="showPage('home')" style="color:var(--amber)">Beranda</a> dan masukkan buku yang sudah kamu baca.</p>
+  </div>
+
+  <div id="rm-content" style="display:none">
+    <div class="rm-layout">
+      <!-- Sidebar level -->
+      <div>
+        <div class="level-card">
+          <div class="lc-eyebrow">Level Literasimu</div>
+          <div class="lc-score" id="lc-score">–</div>
+          <div class="lc-label" id="lc-label">–</div>
+          <div class="lc-bar-t"><div class="lc-bar-f" id="lc-bar" style="width:0%"></div></div>
+        </div>
+        <div class="target-card">
+          <div class="tc-lbl">Target berikutnya</div>
+          <div class="tc-val" id="tc-val">–</div>
+        </div>
+      </div>
+
+      <!-- Mind map -->
+      <div>
+        <div id="map-wrap">
+          <svg id="map-svg"></svg>
+          <div id="map-nodes"></div>
+          <div class="map-legend">
+            <div class="ml-item"><div class="ml-dot" style="background:var(--amber)"></div>Sudah dibaca</div>
+            <div class="ml-item"><div class="ml-dot" style="background:var(--moss-lt)"></div>Rekomendasi</div>
+          </div>
+          <div class="map-ctrls">
+            <button class="mc-btn" onclick="mapZoom(1.2)" title="Zoom in">+</button>
+            <button class="mc-btn" onclick="mapZoom(.83)" title="Zoom out">−</button>
+            <button class="mc-btn" onclick="mapReset()" title="Reset">⌖</button>
+          </div>
+        </div>
+        <!-- Detail panel muncul di bawah map saat node diklik -->
+        <div id="map-detail"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ PROFIL ═══════════════════════ -->
+<div class="page" id="page-profil">
+
+  <!-- Header profil -->
+  <div class="profil-header">
+    <div class="avatar" id="profil-avatar">📚</div>
+    <div>
+      <div class="profil-name" id="profil-name">Pembaca Literasi</div>
+      <div class="profil-sub" id="profil-sub">Bergabung hari ini · 0 buku dibaca</div>
+    </div>
+  </div>
+
+  <!-- Stat cards -->
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="stat-lbl">Buku dibaca</div>
+      <div class="stat-val" id="st-total">0</div>
+      <div class="stat-sub">dari daftar kamu</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-lbl">Rata-rata skor</div>
+      <div class="stat-val" id="st-avg">–</div>
+      <div class="stat-sub" id="st-avg-lbl">belum ada buku</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-lbl">Genre favorit</div>
+      <div class="stat-val" id="st-genre" style="font-size:1rem;padding-top:.3rem;line-height:1.4">–</div>
+      <div class="stat-sub">berdasarkan daftar baca</div>
+    </div>
+  </div>
+
+  <!-- Progress bar level -->
+  <div class="level-progress-wrap">
+    <div class="lp-header">
+      <span class="lp-title">Progress menuju level berikutnya</span>
+      <span class="lp-pct" id="lp-pct">0%</span>
+    </div>
+    <div class="lp-track"><div class="lp-fill" id="lp-fill" style="width:0%"></div></div>
+    <div class="lp-labels">
+      <span id="lp-cur-lbl">–</span>
+      <span id="lp-next-lbl">–</span>
+    </div>
+    <div style="margin-top:.6rem">
+      <span class="lp-milestone" id="lp-milestone">Tambahkan buku untuk melihat progress</span>
+    </div>
+  </div>
+
+  <!-- Genre chart + perpustakaan dalam 2 kolom -->
+  <div class="profil-two-col">
+
+    <!-- Genre favorit -->
+    <div class="genre-wrap">
+      <div class="section-label">Genre favorit</div>
+      <div id="genre-chart">
+        <div class="lib-empty">Belum ada data genre</div>
+      </div>
+    </div>
+
+    <!-- Info level -->
+    <div class="genre-wrap">
+      <div class="section-label">Panduan level</div>
+      <div id="level-guide" style="display:flex;flex-direction:column;gap:.5rem;margin-top:.2rem"></div>
+    </div>
+
+  </div>
+
+  <!-- Perpustakaan pribadi -->
+  <div class="profil-library">
+    <div class="lib-header">
+      <div>
+        <div class="section-label" style="margin-bottom:0">Perpustakaan pribadi</div>
+      </div>
+      <div class="lib-search-wrap">
+        <input type="text" id="lib-search" placeholder="Cari judul…"
+               oninput="filterLibrary(this.value)">
+        <span class="lib-search-icon">🔍</span>
+      </div>
+    </div>
+    <div id="lib-list">
+      <div class="lib-empty">Belum ada buku. Tambahkan dari halaman Beranda.</div>
+    </div>
+  </div>
+
+</div>
+
+</main>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+
+    <!-- Kolom 1: Brand + deskripsi -->
+    <div>
+      <div class="footer-brand-name">
+        <div class="footer-brand-dot"></div>
+        Book Diary
+      </div>
+      <div class="footer-tagline">Leveling Up Your Reading Journey</div>
+      <p class="footer-desc">
+        Book Diary membantu kamu menemukan buku bacaan berikutnya secara cerdas —
+        menganalisis kompleksitas buku yang sudah kamu selesaikan, lalu merekomendasikan
+        judul yang sedikit lebih menantang agar kemampuan literasimu terus berkembang
+        secara bertahap dan terukur.
+      </p>
+    </div>
+
+    <!-- Kolom 2: Navigasi -->
+    <div>
+      <div class="footer-col-title">Navigasi</div>
+      <ul class="footer-links">
+        <li><button onclick="showPage('home')">🏠 Beranda</button></li>
+        <li><button onclick="showPage('search')">🔍 Cari Buku</button></li>
+        <li><button onclick="showPage('roadmap')">🗺️ Peta Jalan</button></li>
+        <li><button onclick="showPage('profil')">👤 Profil</button></li>
+      </ul>
+    </div>
+
+    <!-- Kolom 3: Tentang -->
+    <div>
+      <div class="footer-col-title">Tentang</div>
+      <ul class="footer-links">
+        <li><button onclick="void 0" style="cursor:default">📚 Book Recommendation AI</button></li>
+        <li><button onclick="void 0" style="cursor:default">🎓 Tugas Mata Kuliah AI</button></li>
+        <li><button onclick="void 0" style="cursor:default">💻 Informatika UNDIP</button></li>
+      </ul>
+    </div>
+
+  </div>
+
+  <!-- Bottom bar -->
+  <div class="footer-bottom">
+    <span class="footer-copy">© 2026 Book Diary. All rights reserved.</span>
+    <span class="footer-credit">
+      Dibuat dengan <span class="footer-heart">♥</span> oleh
+      Kelompok 5 Kelas C · Mata Kuliah AI · Informatika UNDIP 2026
+    </span>
+  </div>
+</footer>
+<div class="modal-overlay" id="modal" onclick="closeModal(event)">
+  <div class="modal" id="modal-box">
+    <button class="modal-close" onclick="closeModalBtn()">✕</button>
+    <div id="modal-content"></div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+/* ══════════════════════════════════════════════════════════
+   CONFIG & STATE
+══════════════════════════════════════════════════════════ */
+const API = 'http://localhost:5000';
+
+const S = {
+  books:      [],      // buku yang sudah dibaca
+  roadmap:    null,    // data roadmap terakhir
+  mapScale:   1,
+  mapOX:      0,
+  mapOY:      0,
+  dragging:   false,
+  dragStart:  {x:0,y:0},
+  allNodes:   [],      // semua node yang di-render
+  allBooks:   [],      // gabungan source + recs untuk lookup
+};
+
+/* ══════════════════════════════════════════════════════════
+   NAV
+══════════════════════════════════════════════════════════ */
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  document.getElementById('nav-' + id).classList.add('active');
+  if (id === 'roadmap') loadRoadmap();
+}
+
+/* ══════════════════════════════════════════════════════════
+   TOAST — klik untuk dismiss, auto-dismiss setelah ms
+══════════════════════════════════════════════════════════ */
+let _toastTimer;
+function toast(msg, ms=2800) {
+  clearTimeout(_toastTimer);
+  const el = document.getElementById('toast');
+  el.classList.remove('show');
+  el.textContent = msg;
+  void el.offsetWidth;   // force reflow agar transition terpicu ulang
+  el.classList.add('show');
+  _toastTimer = setTimeout(() => el.classList.remove('show'), ms);
+}
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('toast').addEventListener('click', () => {
+    clearTimeout(_toastTimer);
+    document.getElementById('toast').classList.remove('show');
+  });
+});
+
+/* ══════════════════════════════════════════════════════════
+   HELPERS: complexity
+══════════════════════════════════════════════════════════ */
+function cCls(label) {
+  const m = {'Sangat Mudah':'sangat-mudah','Mudah':'mudah','Menengah':'menengah','Sulit':'sulit','Sangat Sulit':'sangat-sulit'};
+  return m[label] || 'menengah';
+}
+function levelLabel(s) {
+  if (s<=20) return 'Sangat Mudah';
+  if (s<=40) return 'Mudah';
+  if (s<=60) return 'Menengah';
+  if (s<=80) return 'Sulit';
+  return 'Sangat Sulit';
+}
+function barHTML(score, label) {
+  const c = cCls(label);
+  return `<div class="cw">
+    <div class="cw-row"><span>${label}</span><span class="c-badge b-${c}">${score}</span></div>
+    <div class="bar-t"><div class="bar-f c-${c}" style="width:${score}%"></div></div>
+  </div>`;
+}
+function tagsHTML(b) {
+  const lc  = b.language==='id'?'tag-id':'tag-en';
+  const lt  = b.language==='id'?'ID':'EN';
+  const genres = (b.genre_list || (b.genre||'').split('|')).slice(0,3);
+  return `<div class="tags">
+    <span class="tag ${lc}">${lt}</span>
+    ${genres.map(g=>`<span class="tag tag-genre">${g}</span>`).join('')}
+  </div>`;
+}
+
+/* ══════════════════════════════════════════════════════════
+   HOME — AUTOCOMPLETE
+══════════════════════════════════════════════════════════ */
+let _acTimer;
+function onHomeType(v) {
+  clearTimeout(_acTimer);
+  const ac = document.getElementById('home-ac');
+  if (v.length < 2) { ac.classList.remove('open'); return; }
+  _acTimer = setTimeout(async () => {
+    try {
+      const r = await fetch(`${API}/api/books/search?q=${encodeURIComponent(v)}&limit=6`);
+      const d = await r.json();
+      if (!d.data?.books?.length) { ac.classList.remove('open'); return; }
+      ac.innerHTML = d.data.books.map(b =>
+        `<div class="ac-item" onclick='pickBook(${JSON.stringify(b).replace(/'/g,"\\'")})'> 
+           <div class="ac-t">${b.title}</div>
+           <div class="ac-a">${b.author||''}</div>
+         </div>`).join('');
+      ac.classList.add('open');
+    } catch { ac.classList.remove('open'); }
+  }, 280);
+}
+
+function onHomeKey(e) { if(e.key==='Enter') addFromInput(); }
+
+async function addFromInput() {
+  const v = document.getElementById('home-input').value.trim();
+  if (!v) return;
+  document.getElementById('home-ac').classList.remove('open');
+  try {
+    const r = await fetch(`${API}/api/books/search?q=${encodeURIComponent(v)}&limit=1`);
+    const d = await r.json();
+    if (d.data?.books?.length) pickBook(d.data.books[0]);
+    else toast('Buku tidak ditemukan. Coba judul lebih spesifik.');
+  } catch { toast('Tidak bisa terhubung ke server. Pastikan API berjalan.'); }
+}
+
+function pickBook(b) {
+  if (S.books.find(x => x.book_id === b.book_id)) { toast(`"${b.title}" sudah ada.`); return; }
+  // Tidak ada batas — simpan semua buku yang ditambahkan
+  S.books.push(b);
+  S.roadmap = null;
+  renderReadList();
+  updateBadge();
+  document.getElementById('home-input').value = '';
+  document.getElementById('home-ac').classList.remove('open');
+  toast(`✓  "${b.title}" ditambahkan`);
+}
+
+function removeBook(id) {
+  S.books = S.books.filter(b => b.book_id !== id);
+  S.roadmap = null;
+  renderReadList();
+  updateBadge();
+}
+
+function renderReadList() {
+  // Tampilkan 5 buku TERBARU di beranda (terbaru = index terakhir)
+  const recent   = S.books.slice(-5).reverse();
+  const overflow = S.books.length > 5 ? S.books.length - 5 : 0;
+
+  document.getElementById('read-list').innerHTML =
+    recent.map(b => `
+      <div class="read-chip">
+        ${b.title.length>26 ? b.title.slice(0,26)+'…' : b.title}
+        <button onclick="removeBook(${b.book_id})">×</button>
+      </div>`).join('') +
+    (overflow > 0
+      ? `<div class="read-chip" style="background:var(--fog);cursor:pointer"
+             onclick="showPage('profil')" title="Lihat semua di Profil">
+           +${overflow} lainnya →
+         </div>`
+      : '');
+
+  document.getElementById('cta').disabled = S.books.length === 0;
+}
+
+function updateBadge() {
+  if (!S.books.length) {
+    document.getElementById('badge-icon').textContent = '📚';
+    document.getElementById('badge-label').textContent = 'Mulai perjalanan literasimu';
+    return;
+  }
+  const avg = S.books.reduce((s,b)=>s+(b.complexity_score||50),0)/S.books.length;
+  const lbl = levelLabel(avg);
+  const icons = {'Sangat Mudah':'🌱','Mudah':'📗','Menengah':'📘','Sulit':'📙','Sangat Sulit':'🏆'};
+  document.getElementById('badge-icon').textContent  = icons[lbl]||'📚';
+  document.getElementById('badge-label').textContent = `Level: ${lbl} (${avg.toFixed(0)} / 100)`;
+}
+
+function goRoadmap() { showPage('roadmap'); }
+
+/* ══════════════════════════════════════════════════════════
+   SEARCH PAGE — hanya untuk lihat detail
+══════════════════════════════════════════════════════════ */
+async function doSearch() {
+  const q = document.getElementById('search-input').value.trim();
+  if (!q) return;
+  const el = document.getElementById('search-results');
+  el.innerHTML = `<div class="loading-box" style="grid-column:1/-1"><div class="spinner"></div>Mencari…</div>`;
+  try {
+    const r = await fetch(`${API}/api/books/search?q=${encodeURIComponent(q)}&limit=12`);
+    const d = await r.json();
+    if (!d.data?.books?.length) {
+      el.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><div class="ei">🔍</div><p>Tidak ada hasil untuk "${q}".</p></div>`;
+      return;
+    }
+    el.innerHTML = d.data.books.map(b => `
+      <div class="search-card" onclick="openModal(${b.book_id})">
+        ${tagsHTML(b)}
+        <div class="card-title">${b.title}</div>
+        <div class="card-author">${b.author||''}</div>
+        ${barHTML(b.complexity_score, b.complexity_label)}
+        <div class="card-summary">${b.summary_short||''}</div>
+      </div>`).join('');
+  } catch {
+    el.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><div class="ei">⚠️</div><p>Gagal terhubung ke API.</p></div>`;
+  }
+}
+
+/* ── MODAL detail buku ──
+   Simpan data buku di S.modalBook (bukan inline onclick JSON string)
+   agar tidak ada masalah karakter kutip yang bentrok dengan HTML attr.
+── */
+S.modalBook = null;  // buku yang sedang dibuka di modal
+
+async function openModal(bookId) {
+  try {
+    const r = await fetch(`${API}/api/books/${bookId}`);
+    const d = await r.json();
+    if (!d.data) return;
+    const b = d.data.book;
+
+    // Simpan ke state — diakses oleh addFromModal()
+    S.modalBook = b;
+
+    const alreadyAdded = !!S.books.find(x => x.book_id === b.book_id);
+    document.getElementById('modal-content').innerHTML = `
+      ${tagsHTML(b)}
+      <div class="modal-title">${b.title}</div>
+      <div class="modal-author">✍️ ${b.author||'—'}</div>
+      ${barHTML(b.complexity_score, b.complexity_label)}
+      <div class="modal-summary">
+        <div class="modal-summary-lbl">Sinopsis</div>
+        ${b.summary_full || b.summary_short || '—'}
+      </div>
+      <button class="modal-add-btn ${alreadyAdded?'added':''}"
+              id="modal-add-btn"
+              onclick="addFromModal()"
+              ${alreadyAdded?'disabled':''}>
+        ${alreadyAdded?'✓ Sudah di daftar baca':'+ Tambahkan ke daftar baca'}
+      </button>`;
+    document.getElementById('modal').classList.add('open');
+  } catch { toast('Gagal memuat detail buku.'); }
+}
+
+function closeModal(e) {
+  if (e.target === document.getElementById('modal')) closeModalBtn();
+}
+function closeModalBtn() {
+  document.getElementById('modal').classList.remove('open');
+  S.modalBook = null;
+}
+function addFromModal() {
+  if (!S.modalBook) return;
+  pickBook(S.modalBook);
+  // Update tombol di modal tanpa tutup modal
+  const btn = document.getElementById('modal-add-btn');
+  if (btn) {
+    btn.textContent = '✓ Sudah di daftar baca';
+    btn.classList.add('added');
+    btn.disabled = true;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   ROADMAP
+══════════════════════════════════════════════════════════ */
+async function loadRoadmap() {
+  if (!S.books.length) {
+    show('rm-empty'); hide('rm-content'); hide('rm-loading'); return;
+  }
+  if (S.roadmap) {
+    show('rm-content'); hide('rm-empty'); hide('rm-loading'); return;
+  }
+  show('rm-loading'); hide('rm-content'); hide('rm-empty');
+  try {
+    const r = await fetch(`${API}/api/roadmap`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ read_books: S.books.map(b=>b.title), top_n:5 })
+    });
+    const d = await r.json();
+    if (d.status !== 'success') throw new Error(d.message);
+    S.roadmap = d.data;
+    hide('rm-loading'); show('rm-content'); hide('rm-empty');
+    renderRoadmap(d.data);
+  } catch(e) {
+    hide('rm-loading'); show('rm-empty');
+    document.getElementById('rm-empty').querySelector('p').innerHTML =
+      `Gagal memuat peta jalan.<br><small>${e.message}</small>`;
+  }
+}
+
+function show(id) { document.getElementById(id).style.display='block'; }
+function hide(id) { document.getElementById(id).style.display='none'; }
+
+function renderRoadmap(data) {
+  // Level sidebar
+  document.getElementById('lc-score').textContent = data.current_level;
+  document.getElementById('lc-label').textContent = data.current_label;
+  document.getElementById('lc-bar').style.width   = data.current_level + '%';
+  document.getElementById('tc-val').textContent   =
+    `Skor ${data.target_range.min} – ${data.target_range.max}`;
+
+  // Semua buku untuk lookup
+  S.allBooks = [...(data.source_books||[]), ...(data.recommendations||[])];
+
+  // Render mind map
+  buildMindMap(data.roadmap_visualization, data.source_books, data.recommendations);
+}
+
+/* ══════════════════════════════════════════════════════════
+   MIND MAP ENGINE — dibangun ulang dari nol
+══════════════════════════════════════════════════════════ */
+function buildMindMap(viz, sourceBooks, recs) {
+  const wrap  = document.getElementById('map-wrap');
+  const W     = wrap.clientWidth  || 700;
+  const H     = wrap.clientHeight || 520;
+
+  const recNodes = viz.nodes.filter(n => n.type === 'recommended');
+
+  /* ── Posisi ─────────────────────────────────────────────
+     Kiri   : 1 cluster node gabungan semua buku yang dibaca
+     Kanan  : rekomendasi menyebar vertikal
+  ─────────────────────────────────────────────────────── */
+  const CLUSTER_ID = 'cluster-read';
+  const clusterX   = W * 0.22;
+  const clusterY   = H * 0.5;
+
+  const recX     = W * 0.68;
+  const recTotal = recNodes.length;
+  const recPos   = {};
+  recNodes.forEach((n, i) => {
+    const spacing = Math.min(96, (H * 0.80) / Math.max(recTotal, 1));
+    const startY  = H / 2 - ((recTotal - 1) * spacing) / 2;
+    recPos[n.node_id] = { x: recX, y: startY + i * spacing };
+  });
+
+  // allNodes untuk selectNode — gabungkan cluster virtual + rec nodes
+  S.allNodes = [
+    { node_id: CLUSTER_ID, book_id: null, x: clusterX, y: clusterY, type: 'read' },
+    ...recNodes.map(n => ({ ...n, ...recPos[n.node_id] })),
+  ];
+  S.allBooks = [...(sourceBooks || []), ...(recs || [])];
+
+  /* ── Render SVG ──────────────────────────────────────── */
+  const svg = document.getElementById('map-svg');
+  svg.innerHTML = '';
+
+  // Satu garis dari cluster ke setiap rekomendasi
+  recNodes.forEach((n, i) => {
+    const to  = recPos[n.node_id];
+    const rec = S.allBooks.find(b => b.book_id === n.book_id);
+    const delta = rec?.complexity_delta ?? null;
+
+    const cx1 = clusterX + (to.x - clusterX) * 0.55;
+    const cx2 = clusterX + (to.x - clusterX) * 0.45;
+
+    // Garis kurva
+    const path = mkSVG('path');
+    path.setAttribute('d', `M${clusterX},${clusterY} C${cx1},${clusterY} ${cx2},${to.y} ${to.x},${to.y}`);
+    path.setAttribute('fill','none');
+    path.setAttribute('stroke','#ccc5b8');
+    path.setAttribute('stroke-width','1.5');
+    path.setAttribute('stroke-dasharray','5 4');
+    path.setAttribute('opacity','0.8');
+    svg.appendChild(path);
+
+    // Panah di ujung rekomendasi
+    const arr = mkSVG('polygon');
+    arr.setAttribute('points',`${to.x-12},${to.y-4} ${to.x},${to.y} ${to.x-12},${to.y+4}`);
+    arr.setAttribute('fill','var(--moss-lt)');
+    svg.appendChild(arr);
+
+    // Label delta di tengah kurva
+    if (delta !== null) {
+      const mx = (clusterX + to.x) / 2;
+      const my = (clusterY + to.y) / 2 - 12;
+      const fo = mkSVG('foreignObject');
+      fo.setAttribute('x', mx - 26); fo.setAttribute('y', my - 10);
+      fo.setAttribute('width', '54'); fo.setAttribute('height', '22');
+      fo.innerHTML = `<div xmlns="http://www.w3.org/1999/xhtml"
+        style="background:#f0faf0;border:1px solid #b8d8ba;border-radius:999px;
+               padding:1px 6px;font-size:9.5px;font-weight:700;color:#3d5a3e;
+               text-align:center;white-space:nowrap">
+        +${Math.abs(Number(delta)||0).toFixed(0)} poin
+      </div>`;
+      svg.appendChild(fo);
+    }
+  });
+
+  // Titik jangkar di cluster
+  const anchor = mkSVG('circle');
+  anchor.setAttribute('cx', clusterX); anchor.setAttribute('cy', clusterY);
+  anchor.setAttribute('r', '5'); anchor.setAttribute('fill', 'var(--amber)');
+  svg.appendChild(anchor);
+
+  /* ── Render HTML nodes ───────────────────────────────── */
+  const nodesEl = document.getElementById('map-nodes');
+  nodesEl.innerHTML = '';
+
+  // ── Node kiri: cluster buku yang sudah dibaca ─────────
+  // Tampilkan max 5 buku terbaru dalam cluster, sisanya "+N lainnya"
+  const recentBooks  = sourceBooks.slice(-5);
+  const hiddenCount  = sourceBooks.length > 5 ? sourceBooks.length - 5 : 0;
+  const avgScore     = sourceBooks.length
+    ? (sourceBooks.reduce((s,b)=>s+(b.complexity_score||50),0)/sourceBooks.length).toFixed(1)
+    : '–';
+  const avgLabel     = levelLabel(parseFloat(avgScore));
+  const cc           = cCls(avgLabel);
+
+  const cluster = document.createElement('div');
+  cluster.className = 'mn read';
+  cluster.id = `mn-${CLUSTER_ID}`;
+  cluster.style.cssText = `left:${clusterX}px;top:${clusterY}px;width:175px;animation-delay:0ms`;
+  cluster.innerHTML = `
+    <div class="mn-type">Sudah dibaca (${sourceBooks.length} buku)</div>
+    <div style="margin:.3rem 0;display:flex;flex-direction:column;gap:.18rem">
+      ${recentBooks.map(b=>`
+        <div style="font-size:.72rem;line-height:1.25;color:var(--ink);
+             white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
+          ${b.title.length>22?b.title.slice(0,22)+'…':b.title}
+        </div>`).join('')}
+      ${hiddenCount > 0 ? `<div style="font-size:.68rem;color:var(--fog)">+${hiddenCount} buku lainnya</div>` : ''}
+    </div>
+    <div class="mn-score b-${cc}" style="margin-top:.25rem">rata-rata ${avgScore}</div>`;
+  cluster.addEventListener('click', () => showClusterDetail(sourceBooks));
+  nodesEl.appendChild(cluster);
+
+  // ── Node kanan: rekomendasi ───────────────────────────
+  recNodes.forEach((n, idx) => {
+    const p   = recPos[n.node_id];
+    const ncc = cCls(n.label);
+    const div = document.createElement('div');
+    div.className = 'mn rec';
+    div.id = `mn-${n.node_id}`;
+    div.style.cssText = `left:${p.x}px;top:${p.y}px;animation-delay:${(idx+1)*70}ms`;
+    div.innerHTML = `
+      <div class="mn-type">Rekomendasi</div>
+      <div class="mn-title">${n.title}</div>
+      <div class="mn-score b-${ncc}">${n.score}</div>`;
+    div.addEventListener('click', () => selectNode(n.node_id));
+    nodesEl.appendChild(div);
+  });
+
+  resetTransform();
+  setupPanZoom(wrap);
+}
+
+// Klik cluster → tampilkan daftar semua buku yang dibaca di panel detail
+function showClusterDetail(books) {
+  document.querySelectorAll('.mn').forEach(n => n.classList.remove('selected'));
+  const el = document.getElementById(`mn-cluster-read`);
+  if (el) el.classList.add('selected');
+
+  const panel = document.getElementById('map-detail');
+  panel.classList.add('show');
+
+  const avg = books.length
+    ? (books.reduce((s,b)=>s+(b.complexity_score||50),0)/books.length).toFixed(1)
+    : '–';
+
+  panel.innerHTML = `
+    <div>
+      <div class="md-title">Daftar Buku yang Sudah Dibaca</div>
+      <div class="md-author" style="margin-bottom:.8rem">
+        ${books.length} buku · rata-rata skor: <b>${avg}</b> (${levelLabel(parseFloat(avg))})
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.5rem;max-height:200px;overflow-y:auto">
+        ${books.map((b,i)=>{
+          const bc = cCls(b.complexity_label||levelLabel(b.complexity_score||50));
+          return `<div style="display:flex;align-items:center;gap:.5rem;
+            padding:.4rem .6rem;background:var(--cream);border-radius:var(--r-sm)">
+            <span style="font-size:.7rem;color:var(--fog);flex-shrink:0;width:16px">${i+1}</span>
+            <span style="font-size:.78rem;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"
+                  title="${b.title}">${b.title}</span>
+            <span class="c-badge b-${bc}" style="font-size:.68rem;padding:.05rem .35rem;flex-shrink:0">${b.complexity_score||'–'}</span>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`;
+}
+
+function mkSVG(tag) {
+  return document.createElementNS('http://www.w3.org/2000/svg', tag);
+}
+
+/* ── Node selection → tampilkan detail ────────────────── */
+async function selectNode(nodeId) {
+  // Highlight
+  document.querySelectorAll('.mn').forEach(n => n.classList.remove('selected'));
+  const el = document.getElementById(`mn-${nodeId}`);
+  if (el) el.classList.add('selected');
+
+  // Cari data buku dari state
+  const node = S.allNodes.find(n => n.node_id === nodeId);
+  if (!node) return;
+  const book = S.allBooks.find(b => b.book_id === node.book_id);
+  if (!book) return;
+
+  // Tampilkan dulu dengan data yang ada (summary_short)
+  renderMapDetail(book, node.type);
+
+  // Fetch sinopsis penuh dari API di background, lalu update panel
+  try {
+    const r = await fetch(`${API}/api/books/${node.book_id}`);
+    const d = await r.json();
+    if (d.data?.book?.summary_full) {
+      // Gabungkan data lengkap lalu render ulang
+      renderMapDetail({ ...book, summary_full: d.data.book.summary_full }, node.type);
+    }
+  } catch { /* Tidak masalah, summary_short sudah tampil */ }
+}
+
+function renderMapDetail(b, type) {
+  const panel = document.getElementById('map-detail');
+  panel.classList.add('show');
+
+  // Tentukan apakah sinopsis perlu dipotong
+  const full  = b.summary_full || b.summary_short || '—';
+  const short = full.length > 180 ? full.slice(0, 180).trimEnd() + '…' : full;
+  const needsExpand = full.length > 180;
+  const summaryId   = `summary-${b.book_id}`;
+  const btnId       = `expand-btn-${b.book_id}`;
+
+  panel.innerHTML = `
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-wrap:wrap">
+      <div style="flex:1;min-width:200px">
+        ${tagsHTML(b)}
+        <div class="md-title">${b.title}</div>
+        <div class="md-author">✍️ ${b.author||'—'}</div>
+        ${barHTML(b.complexity_score, b.complexity_label)}
+        ${b.complexity_delta != null
+          ? `<div style="margin-top:.4rem"><span class="delta-pill">↑ +${Math.abs(b.complexity_delta).toFixed(1)} poin lebih sulit dari buku sebelumnya</span></div>`
+          : ''}
+        ${b.roadmap_step ? `<div style="font-size:.75rem;color:var(--fog);margin-top:.35rem">🗺️ ${b.roadmap_step}</div>` : ''}
+      </div>
+      <div class="md-summary" style="flex:1;min-width:200px">
+        <div class="md-sum-lbl">Sinopsis</div>
+        <span id="${summaryId}">${short}</span>${needsExpand ? `
+        <button id="${btnId}" onclick="toggleSummary('${summaryId}','${btnId}',\`${full.replace(/`/g,'\\`')}\`)"
+          style="display:inline;background:none;border:none;cursor:pointer;
+                 color:var(--amber);font-size:.82rem;font-weight:500;
+                 padding:0 0 0 .3rem;font-family:'DM Sans',sans-serif">
+          Selengkapnya
+        </button>` : ''}
+      </div>
+    </div>`;
+}
+
+function toggleSummary(spanId, btnId, fullText) {
+  const span = document.getElementById(spanId);
+  const btn  = document.getElementById(btnId);
+  if (!span || !btn) return;
+  const isExpanded = btn.textContent.trim() === 'Sembunyikan';
+  span.textContent = isExpanded
+    ? fullText.slice(0, 180).trimEnd() + '…'
+    : fullText;
+  btn.textContent  = isExpanded ? 'Selengkapnya' : 'Sembunyikan';
+}
+
+/* ══════════════════════════════════════════════════════════
+   PAN & ZOOM
+══════════════════════════════════════════════════════════ */
+function applyTransform() {
+  const t = `translate(${S.mapOX}px,${S.mapOY}px) scale(${S.mapScale})`;
+  const origin = '0 0';
+  const svg    = document.getElementById('map-svg');
+  const nodes  = document.getElementById('map-nodes');
+  svg.style.transformOrigin = nodes.style.transformOrigin = origin;
+  svg.style.transform = nodes.style.transform = t;
+}
+function resetTransform() {
+  S.mapScale=1; S.mapOX=0; S.mapOY=0; applyTransform();
+}
+function mapZoom(f) {
+  S.mapScale = Math.max(.35, Math.min(2.6, S.mapScale * f));
+  applyTransform();
+}
+function mapReset() { resetTransform(); }
+
+function setupPanZoom(wrap) {
+  wrap.addEventListener('mousedown', e => {
+    if (e.target.classList.contains('mc-btn')) return;
+    S.dragging = true;
+    S.dragStart = { x: e.clientX - S.mapOX, y: e.clientY - S.mapOY };
+  });
+  window.addEventListener('mousemove', e => {
+    if (!S.dragging) return;
+    S.mapOX = e.clientX - S.dragStart.x;
+    S.mapOY = e.clientY - S.dragStart.y;
+    applyTransform();
+  });
+  window.addEventListener('mouseup', () => { S.dragging = false; });
+  wrap.addEventListener('wheel', e => {
+    e.preventDefault();
+    mapZoom(e.deltaY > 0 ? 0.88 : 1.12);
+  }, {passive:false});
+}
+
+/* ══════════════════════════════════════════════════════════
+   PROFIL PAGE
+══════════════════════════════════════════════════════════ */
+
+// Level thresholds: [min_score, max_score, label, icon]
+const LEVELS = [
+  [0,  20,  'Sangat Mudah', '🌱'],
+  [20, 40,  'Mudah',        '📗'],
+  [40, 60,  'Menengah',     '📘'],
+  [60, 80,  'Sulit',        '📙'],
+  [80, 100, 'Sangat Sulit', '🏆'],
+];
+
+function getCurrentLevel(score) {
+  return LEVELS.find(([lo, hi]) => score >= lo && score < hi) || LEVELS[LEVELS.length - 1];
+}
+function getNextLevel(score) {
+  const idx = LEVELS.findIndex(([lo, hi]) => score >= lo && score < hi);
+  return idx < LEVELS.length - 1 ? LEVELS[idx + 1] : null;
+}
+
+function renderProfil() {
+  const books = S.books;
+  const n     = books.length;
+
+  // ── Header ────────────────────────────────────────────
+  const avg = n ? books.reduce((s, b) => s + (b.complexity_score || 50), 0) / n : 0;
+  const [,, curLbl, curIcon] = getCurrentLevel(avg);
+  document.getElementById('profil-avatar').textContent = curIcon;
+  document.getElementById('profil-name').textContent   = 'Pembaca Literasi';
+  document.getElementById('profil-sub').textContent    =
+    `${n} buku dibaca · Level: ${curLbl}`;
+
+  // ── Stat cards ─────────────────────────────────────────
+  document.getElementById('st-total').textContent    = n;
+  document.getElementById('st-avg').textContent      = n ? avg.toFixed(1) : '–';
+  document.getElementById('st-avg-lbl').textContent  = n ? curLbl : 'belum ada buku';
+
+  // Genre favorit (dari semua genre buku yang dibaca)
+  const genreCounts = {};
+  books.forEach(b => {
+    const genres = (b.genre_list || (b.genre || '').split('|'));
+    genres.forEach(g => {
+      g = g.trim();
+      if (g) genreCounts[g] = (genreCounts[g] || 0) + 1;
+    });
+  });
+  const topGenres = Object.entries(genreCounts).sort((a,b) => b[1]-a[1]);
+  document.getElementById('st-genre').textContent = topGenres.length
+    ? topGenres[0][0]
+    : '–';
+
+  // ── Progress bar level ──────────────────────────────────
+  const [curLo, curHi] = getCurrentLevel(avg);
+  const nextLvl = getNextLevel(avg);
+  const pct = n
+    ? Math.min(100, Math.round(((avg - curLo) / (curHi - curLo)) * 100))
+    : 0;
+
+  document.getElementById('lp-fill').style.width = pct + '%';
+  document.getElementById('lp-pct').textContent  = pct + '%';
+  document.getElementById('lp-cur-lbl').textContent  = curLbl + ` (${curLo}–${curHi})`;
+  document.getElementById('lp-next-lbl').textContent = nextLvl
+    ? nextLvl[2] + ` (${nextLvl[0]}–${nextLvl[1]})`
+    : '🏆 Level tertinggi';
+
+  const remaining = nextLvl ? (nextLvl[0] - avg).toFixed(1) : 0;
+  document.getElementById('lp-milestone').innerHTML = n && nextLvl
+    ? `Butuh <b>+${remaining} poin</b> lagi untuk mencapai level <b>${nextLvl[2]}</b>`
+    : n
+      ? `Kamu sudah di level tertinggi! 🏆`
+      : `Tambahkan buku untuk melihat progress`;
+
+  // ── Genre chart ─────────────────────────────────────────
+  const chartEl = document.getElementById('genre-chart');
+  if (!topGenres.length) {
+    chartEl.innerHTML = '<div class="lib-empty">Belum ada data genre</div>';
+  } else {
+    const maxCount = topGenres[0][1];
+    chartEl.innerHTML = topGenres.slice(0, 7).map(([g, cnt]) => `
+      <div class="genre-row">
+        <span class="genre-name" title="${g}">${g}</span>
+        <div class="genre-bar-t">
+          <div class="genre-bar-f" style="width:${Math.round(cnt/maxCount*100)}%"></div>
+        </div>
+        <span class="genre-count">${cnt}</span>
+      </div>`).join('');
+  }
+
+  // ── Panduan level ────────────────────────────────────────
+  document.getElementById('level-guide').innerHTML = LEVELS.map(([lo, hi, lbl, icon]) => {
+    const active = avg >= lo && avg < hi && n > 0;
+    return `<div style="display:flex;align-items:center;gap:.7rem;padding:.45rem .6rem;
+      border-radius:var(--r-sm);background:${active?'var(--cream)':'transparent'};
+      border:1px solid ${active?'var(--fog-lt)':'transparent'}">
+      <span style="font-size:1rem">${icon}</span>
+      <div style="flex:1">
+        <div style="font-size:.82rem;font-weight:${active?'500':'400'};color:var(--ink)">${lbl}</div>
+        <div style="font-size:.72rem;color:var(--fog)">Skor ${lo}–${hi}</div>
+      </div>
+      ${active ? `<span style="font-size:.7rem;background:var(--amber);color:var(--white);
+        border-radius:999px;padding:.1rem .5rem;font-weight:500">Kamu di sini</span>` : ''}
+    </div>`;
+  }).join('');
+
+  // ── Perpustakaan ─────────────────────────────────────────
+  renderLibrary('');
+}
+
+function renderLibrary(query) {
+  const el    = document.getElementById('lib-list');
+  const books = S.books.filter(b =>
+    !query || b.title.toLowerCase().includes(query.toLowerCase()) ||
+    (b.author || '').toLowerCase().includes(query.toLowerCase())
+  );
+
+  if (!books.length) {
+    el.innerHTML = query
+      ? `<div class="lib-empty">Tidak ada buku yang cocok dengan "${query}"</div>`
+      : `<div class="lib-empty">Belum ada buku. Tambahkan dari halaman Beranda.</div>`;
+    return;
+  }
+
+  el.innerHTML = books.map((b, i) => {
+    const cc  = cCls(b.complexity_label || levelLabel(b.complexity_score || 50));
+    return `
+    <div class="lib-item">
+      <div class="lib-num">${i + 1}</div>
+      <div class="lib-info">
+        <div class="lib-title" title="${b.title}">${b.title}</div>
+        <div class="lib-author">${b.author || '—'}</div>
+      </div>
+      <div class="lib-right">
+        <div style="text-align:right">
+          <span class="lib-score c-badge b-${cc}">${b.complexity_score || '–'}</span>
+          <span class="lib-score-lbl">${b.complexity_label || ''}</span>
+        </div>
+        <button class="lib-remove" onclick="removeFromLib(${b.book_id})" title="Hapus dari daftar">×</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function filterLibrary(q) { renderLibrary(q); }
+
+function removeFromLib(id) {
+  removeBook(id);      // fungsi yang sudah ada di home
+  renderProfil();      // update tampilan profil
+}
+
+/* ── Patch showPage agar render profil saat dibuka ── */
+const _origShowPage = showPage;
+showPage = function(id) {
+  _origShowPage(id);
+  if (id === 'profil') renderProfil();
+};
+
+/* ══════════════════════════════════════════════════════════
+   INIT
+══════════════════════════════════════════════════════════ */
+(async function init() {
+  try {
+    const r = await fetch(`${API}/api/health`);
+    const d = await r.json();
+    if (d.status === 'success')
+      toast(`✓ Terhubung — ${(d.data.total_books||0).toLocaleString('id')} buku tersedia`);
+  } catch {
+    toast('⚠️ API tidak terhubung. Jalankan step4_api.py terlebih dahulu.', 4500);
+  }
+})();
+</script>
+</body>
+</html>
+
+File requirements.txt
+# ============================================================
+# PETA JALAN LITERASI - Requirements
+# Dioptimalkan untuk CPU-only, resource rendah di VSCode
+# ============================================================
+
+# ── LFTK (brucewlee/lftk) + spaCy ─────────────────────────────
+# Dipakai untuk buku bahasa INGGRIS di step2_complexity.py
+lftk>=1.0.9
+spacy>=3.5.0,<4.0.0
+
+# Model spaCy untuk bahasa Inggris (install setelah pip install spacy):
+#   python -m spacy download en_core_web_sm
+# Model ini ~12MB, ringan, cukup untuk fitur surface + readformula
+
+# ── NLP Tambahan (untuk buku bahasa Indonesia) ─────────────────
+textstat>=0.7.3       # Readability scores (Flesch, Gunning Fog)
+nltk>=3.8.1           # Tokenisasi, stopwords
+selenium>=4.15.0      # WebDriver manager for browser automation
+webdriver-manager>=0.15.0 # Manajemen driver untuk Selenium (otomatis download driver yang cocok)
+
+# ── Data & Numerik ─────────────────────────────────────────────
+numpy>=1.24.0
+pandas>=2.0.0
+
+# ── Rekomendasi (step3) ────────────────────────────────────────
+scikit-learn>=1.3.0   # TF-IDF + cosine similarity, ringan di CPU
+PySastrawi>=1.2.0   # Stemmer bahasa Indonesia, ringan di CPU
+
+# ── API Backend (step4) ────────────────────────────────────────
+flask>=3.0.0
+flask-cors>=4.0.0
+
+# ── Utility ────────────────────────────────────────────────────
+requests>=2.31.0      # Download dataset CMU
+python-dotenv>=1.0.0
+tqdm>=4.66.0
+
+# ── TIDAK dipakai (terlalu berat untuk CPU) ────────────────────
+# torch, tensorflow, transformers, sentence-transformers
+# xx_sent_ud_sm (model spaCy multilingual — tidak dibutuhkan di Opsi A)
+
+# ── URUTAN INSTALL YANG DISARANKAN ────────────────────────────
+# 1. pip install -r requirements.txt
+# 2. python -m spacy download en_core_web_sm
+# 3. python -c "import nltk; nltk.download('punkt_tab'); nltk.download('stopwords'); nltk.download('averaged_perceptron_tagger_eng')"
+# 4. python run_all.py
+
+File run_all.py
+"""
+=================================================================
+PETA JALAN LITERASI - RUN ALL
+=================================================================
+Jalankan semua step secara berurutan:
+  python run_all.py
+
+Atau jalankan satu per satu:
+  python step1_preprocess.py
+  python step2_complexity.py
+  python step3_train_recommender.py
+  python step4_api.py   ← Jalankan ini terpisah (server)
+=================================================================
+
+STRUKTUR PROYEK
+───────────────
+proyek-literasi/
+├── requirements.txt          ← Install dulu: pip install -r requirements.txt
+├── run_all.py                ← Script ini
+│
+├── step1_preprocess.py       ← Download + bersihkan data buku
+├── step2_complexity.py       ← Hitung Complexity Score (LFTK-inspired)
+├── step3_train_recommender.py← Training model rekomendasi
+├── step4_api.py              ← Flask API server
+│
+└── data/
+    ├── raw/
+    │   └── booksummaries.tar.gz    ← Dataset CMU (download otomatis)
+    ├── clean/
+    │   ├── books_clean.csv         ← Output step1
+    │   ├── books_scored.csv        ← Output step2 (ada complexity_score)
+    │   └── books_features.csv      ← Detail fitur linguistik (step2)
+    └── model/
+        └── recommender.pkl         ← Model terlatih (step3)
+
+
+ALUR DATA (DATA FLOW)
+─────────────────────
+
+[CMU/Dummy Dataset]
+       │
+       ▼
+[Step 1: Preprocess]
+  - Download dataset
+  - Bersihkan teks
+  - Deteksi bahasa ID/EN
+  - Output: books_clean.csv
+  Kolom: book_id, title, author, genre, language, summary, complexity_score
+       │
+       ▼
+[Step 2: Complexity Score]
+  - Ekstrak fitur linguistik (LFTK-inspired):
+      flesch_difficulty, gunning_fog, avg_sent_len,
+      avg_word_len, ttr, lexical_density, long_word_ratio
+  - Hitung weighted score (0–100)
+  - Output: books_scored.csv
+  Kolom: semua dari step1 + complexity_score + complexity_label
+       │
+       ▼
+[Step 3: Training]
+  - TF-IDF pada genre + summary
+  - Bangun genre index untuk filter cepat
+  - Simpan model ke recommender.pkl
+  Input model.recommend(title):
+    1. Cari buku sumber
+    2. Filter kandidat: genre overlap + complexity [+3, +15]
+    3. Rank dengan cosine similarity
+    4. Return top-N rekomendasi
+       │
+       ▼
+[Step 4: Flask API]
+  - Load model.pkl
+  - Expose endpoint REST
+  - Format response JSON (lihat kontrak di step4_api.py)
+       │
+       ▼
+[Frontend (future)]
+  - Tangkap /api/roadmap
+  - Render "Peta Perjalanan" dari roadmap_visualization.nodes + edges
+  - Tampilkan progress bar complexity_score
+  - Buat koneksi antar buku dari edges
+
+
+KONTRAK JSON: FIELD PENTING UNTUK FRONTEND
+───────────────────────────────────────────
+Setiap objek buku dalam response mengandung field berikut.
+Penamaan ini HARUS konsisten antara backend dan frontend.
+
+Field              Tipe     Keterangan untuk UI
+─────────────────────────────────────────────────────────
+book_id            int      React key, link ke halaman detail
+title              str      Nama buku, judul kartu
+author             str      Nama penulis, sub-judul kartu
+genre_list         list     Render sebagai chip/tag berwarna
+language           str      Badge "ID" (biru) atau "EN" (hijau)
+summary_short      str      Teks 150 karakter, deskripsi kartu
+complexity_score   float    Progress bar 0–100
+complexity_label   str      Badge warna: hijau/kuning/merah
+complexity_delta   float    "+7.3 poin" lebih sulit dari sebelumnya
+roadmap_step       str      Teks tooltip di node peta jalan
+─────────────────────────────────────────────────────────
+
+FIELD KHUSUS ROADMAP VISUALIZATION (dari /api/roadmap):
+  nodes[].type = "read"        → Node buku yang sudah dibaca (biru)
+  nodes[].type = "recommended" → Node rekomendasi (oranye)
+  edges[].delta                → Angka kenaikan (+) untuk label panah
+  complexity_axis.zones        → Warna background zona di sumbu Y
+
+
+CARA INSTALL & JALANKAN
+────────────────────────
+1. Buka terminal di VSCode
+2. Buat virtual environment (disarankan):
+     python -m venv venv
+     # Windows:
+     venv\Scripts\activate
+     # Mac/Linux:
+     source venv/bin/activate
+
+3. Install dependencies:
+     pip install -r requirements.txt
+
+4. Download model NLTK (otomatis saat pertama jalan, atau manual):
+     python -c "import nltk; nltk.download('punkt_tab'); nltk.download('stopwords'); nltk.download('averaged_perceptron_tagger_eng')"
+
+5. Jalankan semua pipeline:
+     python run_all.py
+
+6. Atau jalankan API saja (jika sudah ada model):
+     python step4_api.py
+
+7. Test API di browser atau Postman:
+     GET  http://localhost:5000/api/health
+     GET  http://localhost:5000/api/books/search?q=harry
+     POST http://localhost:5000/api/recommend
+          Body: {"book_title": "Harry Potter", "top_n": 5}
+     POST http://localhost:5000/api/roadmap
+          Body: {"read_books": ["Laskar Pelangi", "Sang Pemimpi"], "top_n": 5}
+
+ESTIMASI RESOURCE (CPU ONLY):
+  Step 1: ~10 detik (data dummy) / ~2 menit (dataset penuh)
+  Step 2: ~1-3 menit untuk 5000 buku
+  Step 3: ~5-15 detik
+  Step 4: Response time ~50–200ms per request
+  RAM   : ~200-400MB saat API berjalan
+=================================================================
+"""
+
+import sys
+import time
+
+def run_step(step_name: str, func, *args):
+    print(f"\n{'='*55}")
+    print(f"  MENJALANKAN: {step_name}")
+    print(f"{'='*55}")
+    t0 = time.time()
+    result = func(*args)
+    elapsed = time.time() - t0
+    print(f"\n[OK] {step_name} selesai dalam {elapsed:.1f} detik")
+    return result
+
+
+if __name__ == "__main__":
+    print("""
+╔═══════════════════════════════════════════════════╗
+║      PETA JALAN LITERASI - FULL PIPELINE          ║
+║      Book Recommendation AI untuk Pembaca ID/EN   ║
+╚═══════════════════════════════════════════════════╝
+    """)
+
+    # Import semua step
+    try:
+        from step1_preprocess       import preprocess_pipeline
+        from step2_complexity       import complexity_pipeline
+        from step3_train_recommender import training_pipeline
+    except ImportError as e:
+        print(f"[ERROR] Import gagal: {e}")
+        print("        Pastikan semua file step1-3 ada di folder yang sama.")
+        sys.exit(1)
+
+    # Jalankan step 1–3
+    run_step("Step 1: Pra-pemrosesan Data",    preprocess_pipeline)
+    run_step("Step 2: Complexity Scoring",     complexity_pipeline)
+    run_step("Step 3: Training Model",         training_pipeline)
+
+    print("""
+╔═══════════════════════════════════════════════════╗
+║  ✅ SEMUA STEP SELESAI!                           ║
+║                                                   ║
+║  Sekarang jalankan API server:                    ║
+║    python step4_api.py                            ║
+║                                                   ║
+║  Lalu test di browser:                            ║
+║    http://localhost:5000/api/health               ║
+╚═══════════════════════════════════════════════════╝
+    """)
+
+
+File scraper.py
+"""
+=================================================================
+PETA JALAN LITERASI - SCRAPER GRAMEDIA (MASS SCRAPING ULTIMATE)
+=================================================================
+Fungsi: Mengambil 1000 data buku dari Gramedia.com.
+Alur  : Kategori -> Klik "Muat Lebih Banyak" -> Ekstrak Buku
+Output: data/raw/gramedia_scraped.csv
+=================================================================
+"""
+
+import time
+import json
+import os
+import re
+import pandas as pd
+import numpy as np
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from webdriver_manager.chrome import ChromeDriverManager
+
+# ─── KONFIGURASI ────────────────────────────────────────────────
+TARGET_URL = "https://www.gramedia.com/categories/buku/fiksi-sastra"
+MAX_BOOKS = 1000  # Target jumlah buku
+OUTPUT_DIR = "data/raw"
+OUTPUT_FILE = os.path.join(OUTPUT_DIR, "gramedia_scraped.csv")
+
+def ensure_dir():
+    if not os.path.exists(OUTPUT_DIR):
+        os.makedirs(OUTPUT_DIR)
+
+def init_driver():
+    chrome_options = Options()
+    # chrome_options.add_argument("--headless")
+    chrome_options.add_argument("--disable-gpu")
+    chrome_options.add_argument("--window-size=1920,1080")
+    
+    chrome_options.add_argument("--disable-blink-features=AutomationControlled")
+    chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
+    chrome_options.add_experimental_option('useAutomationExtension', False)
+    
+    service = Service(ChromeDriverManager().install())
+    driver = webdriver.Chrome(service=service, options=chrome_options)
+    
+    driver.execute_cdp_cmd('Network.setUserAgentOverride', {
+        "userAgent": 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+    })
+    return driver
+
+def scrape_gramedia():
+    ensure_dir()
+    driver = init_driver()
+    books_data = []
+    master_book_urls = []
+    
+    print(f"\n[INFO] Membuka halaman kategori utama: {TARGET_URL}")
+    driver.get(TARGET_URL)
+    time.sleep(4)
+
+    # ==============================================================
+    # FASE 1: KUMPULKAN TAUTAN SUB-KATEGORI
+    # ==============================================================
+    print("[INFO] Mengumpulkan tautan sub-kategori...")
+    subcategories = []
+    try:
+        subcat_elements = driver.find_elements(By.CSS_SELECTOR, "a[href*='/categories/buku/fiksi-sastra/']")
+        for elem in subcat_elements:
+            url = elem.get_attribute("href")
+            if url and url not in subcategories:
+                subcategories.append(url)
+    except Exception as e:
+        print(f"[ERROR] Gagal mengambil sub-kategori: {e}")
+
+    if not subcategories:
+        subcategories = [TARGET_URL]
+    else:
+        print(f"[INFO] Ditemukan {len(subcategories)} sub-kategori.")
+
+    # ==============================================================
+    # FASE 2: KLIK "MUAT LEBIH BANYAK" & KUMPULKAN TAUTAN BUKU
+    # ==============================================================
+    for subcat_url in subcategories:
+        if len(master_book_urls) >= MAX_BOOKS:
+            break
+            
+        print(f"\n[INFO] Memasuki sub-kategori: {subcat_url.split('/')[-1]}")
+        driver.get(subcat_url)
+        time.sleep(3)
+        
+        print("       Mencari tombol 'Muat Lebih Banyak'...")
+        for _ in range(20):
+            # Scroll ke area bawah tempat tombol biasa berada
+            driver.execute_script("window.scrollTo(0, document.body.scrollHeight - 800);")
+            time.sleep(2)
+            
+            try:
+                # Cari khusus elemen <button> agar tidak salah klik teks lain
+                btn_xpath = "//button[contains(translate(., 'MUAT LEBIH BANYAK', 'muat lebih banyak'), 'muat lebih banyak')]"
+                load_more_btn = driver.find_element(By.XPATH, btn_xpath)
+                
+                # CEK 1: Apakah tombolnya benar-benar terlihat?
+                if not load_more_btn.is_displayed():
+                    print("       [-] Tombol sudah disembunyikan. Lanjut...")
+                    break
+                
+                driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", load_more_btn)
+                time.sleep(1)
+                
+                # CEK 2: Hitung buku sebelum klik
+                books_before = len(driver.find_elements(By.CSS_SELECTOR, "a[href*='/products/']"))
+                
+                # Lakukan klik
+                driver.execute_script("arguments[0].click();", load_more_btn)
+                print("       [+] Klik 'Muat Lebih Banyak' dieksekusi.")
+                time.sleep(3) # Tunggu buku baru termuat
+                
+                # Hitung buku setelah klik
+                books_after = len(driver.find_elements(By.CSS_SELECTOR, "a[href*='/products/']"))
+                if books_after == books_before:
+                    print("       [-] Tidak ada buku baru yang muncul. Lanjut...")
+                    break # Keluar dari loop klik
+                    
+            except Exception:
+                # Jika tombol benar-benar tidak ditemukan di HTML
+                break
+                
+        # Kumpulkan semua link buku yang berhasil dimuat
+        links = driver.find_elements(By.CSS_SELECTOR, "a[href*='/products/']")
+        added_count = 0
+        for link in links:
+            url = link.get_attribute("href")
+            if url and url not in master_book_urls:
+                master_book_urls.append(url)
+                added_count += 1
+                if len(master_book_urls) >= MAX_BOOKS:
+                    break
+        print(f"       Mendapatkan {added_count} tautan buku baru. (Total sementara: {len(master_book_urls)})")
+
+    print(f"\n[INFO] Selesai mengumpulkan tautan. Total target eksekusi: {len(master_book_urls)} buku.\n")
+
+    # ==============================================================
+    # FASE 3: EKSTRAKSI DATA BUKU VIA JSON-LD
+    # ==============================================================
+    try:
+        for idx, url in enumerate(master_book_urls):
+            print(f"[{idx+1}/{len(master_book_urls)}] Membuka: {url}")
+            driver.get(url)
+            time.sleep(2)
+            
+            try:
+                title = "Anonim"
+                author = "Anonim"
+                summary = ""
+                raw_genres = []
+                language_code = "id"
+
+                # 1. Ambil Genre dari Visual
+                try:
+                    breadcrumb_links = driver.find_elements(By.CSS_SELECTOR, "a[href*='/categories/']")
+                    for link in breadcrumb_links:
+                        cat_text = link.text.strip()
+                        if cat_text and cat_text.lower() not in ["home", "buku"]:
+                            if cat_text not in raw_genres:
+                                raw_genres.append(cat_text)
+                except:
+                    pass
+
+                # 2. Ambil Data dari JSON-LD
+                ld_scripts = driver.find_elements(By.XPATH, "//script[@type='application/ld+json']")
+                for script in ld_scripts:
+                    try:
+                        data = json.loads(script.get_attribute("innerHTML"))
+                        if isinstance(data, dict): data = [data]
+                            
+                        for item in data:
+                            if item.get("@type") == "DataFeed" and "dataFeedElement" in item:
+                                for feed_item in item["dataFeedElement"]:
+                                    if feed_item.get("@type") == "Book":
+                                        title = feed_item.get("name", title)
+                                        summary = feed_item.get("description", summary)
+                                        
+                                        lang_raw = feed_item.get("inLanguage", "")
+                                        if lang_raw and "english" in lang_raw.lower():
+                                            language_code = "en"
+                                            
+                                        if "author" in feed_item and isinstance(feed_item["author"], list):
+                                            author = feed_item["author"][0].get("name", author)
+                    except:
+                        continue
+
+                # Fallback Judul
+                if title == "Anonim":
+                    try:
+                        title = driver.find_element(By.CSS_SELECTOR, "meta[property='og:title']").get_attribute("content").split("|")[0].strip()
+                    except: pass
+
+                # 3. Cleansing Genre
+                cleaned_genres = []
+                for g in raw_genres:
+                    g = g.replace('Fiksi', 'Fiction').replace('fiksi', 'fiction').capitalize()
+                    if g not in cleaned_genres:
+                        cleaned_genres.append(g)
+                genre_str = "|".join(cleaned_genres[-2:]) if cleaned_genres else "Fiction"
+                
+                # 4. Cleansing Sinopsis
+                if summary:
+                    summary = re.sub(r'\s+', ' ', summary).strip()
+                    stop_phrases = [
+                        "Selling Point:", "Selling point:", "Profil Penulis:",
+                        "Tentang Penulis", "Pernahkah Anda terpikir", 
+                        "Tahun Terbit", "*******************"
+                    ]
+                    cut_index = len(summary)
+                    for phrase in stop_phrases:
+                        idx_pos = summary.find(phrase)
+                        if idx_pos != -1 and idx_pos < cut_index:
+                            cut_index = idx_pos
+                    summary = summary[:cut_index].strip()
+
+                if summary and len(summary) > 50 and title != "Anonim":
+                    books_data.append({
+                        "title": title,
+                        "author": author,
+                        "genre": genre_str,
+                        "language": language_code,
+                        "summary": summary,
+                        "complexity_score": np.nan
+                    })
+                    print(f"  [SUKSES] {title} | Lang: {language_code}")
+                else:
+                    print(f"  [SKIP] Data tidak lengkap.")
+                    
+            except Exception as e:
+                print(f"  [GAGAL] Terjadi error: {e}")
+                continue
+
+    finally:
+        # ==============================================================
+        # FASE 4: SIMPAN KE CSV
+        # ==============================================================
+        driver.quit()
+        if books_data:
+            df = pd.DataFrame(books_data)
+            df.insert(0, "book_id", range(5001, 5001 + len(df)))
+            df.to_csv(OUTPUT_FILE, index=False, encoding="utf-8-sig")
+            print(f"\n[SELESAI] {len(df)} Buku berhasil disimpan ke: {OUTPUT_FILE}")
+        else:
+            print("\n[INFO] Tidak ada data buku yang berhasil diekstrak.")
+
+if __name__ == "__main__":
+    scrape_gramedia()
+
+File step1_preprocess.py
+"""
+=================================================================
+PETA JALAN LITERASI - STEP 1: PRA-PEMROSESAN DATA
+=================================================================
+Fungsi:
+  1. Download dataset CMU (buku bahasa Inggris, ~16k buku)
+  2. Load & gabungkan CSV buku Indonesia dari scraping Gramedia
+     (data/raw/gramedia_scraped.csv) jika tersedia
+  3. Bersihkan teks, parse genre, deteksi bahasa
+  4. Simpan ke data/clean/books_clean.csv
+
+Sumber data:
+  - CMU Book Summary Dataset → buku EN
+  - data/raw/gramedia_scraped.csv → buku ID dari Gramedia
+  - generate_indonesian_books() → 18 buku ID kurasi manual (fallback)
+
+Jalankan: python step1_preprocess.py
+=================================================================
+"""
+
+import os
+import re
+import ast
+import requests
+import pandas as pd
+import numpy as np
+from tqdm import tqdm
+
+# ─── KONFIGURASI ────────────────────────────────────────────────
+DATA_DIR   = "data"
+RAW_DIR    = os.path.join(DATA_DIR, "raw")
+CLEAN_DIR  = os.path.join(DATA_DIR, "clean")
+
+DATASET_URL    = "http://www.cs.cmu.edu/~dbamman/data/booksummaries.tar.gz"
+RAW_FILE       = os.path.join(RAW_DIR, "booksummaries.tar.gz")
+GRAMEDIA_FILE  = os.path.join(RAW_DIR, "gramedia_scraped.csv")   # ← CSV Gramedia
+CLEAN_FILE     = os.path.join(CLEAN_DIR, "books_clean.csv")
+
+MAX_EN_BOOKS   = 4800   # Batas buku EN dari CMU agar total tidak terlalu besar
+
+COLUMNS_OUT = [
+    "book_id", "title", "author", "genre",
+    "language", "summary", "complexity_score",
+]
+
+# ─── FREEBASE ID → NAMA GENRE ───────────────────────────────────
+# CMU dataset menyimpan genre sebagai Freebase ID (misal /m/02xlf).
+# Tabel ini memetakan ID yang paling sering muncul ke nama yang
+# manusia bisa baca. ID yang tidak ada di tabel ini akan dibuang.
+FREEBASE_GENRE_MAP = {
+    "/m/02xlf":  "Fiction",
+    "/m/05hgj":  "Novel",
+    "/m/06nbt":  "Adventure",
+    "/m/017fp":  "Romance",
+    "/m/06n90":  "Science Fiction",
+    "/m/0hn10":  "Non-fiction",
+    "/m/03npn":  "Mystery",
+    "/m/03g3w":  "Children's literature",
+    "/m/02js9":  "Historical novel",
+    "/m/01hmnh":  "Short story",
+    "/m/06wkf":  "Crime Fiction",
+    "/m/0mz2":   "Horror",
+    "/m/02p0szs": "Thriller",
+    "/m/0dwly":  "Fantasy",
+    "/m/07m5w1": "Graphic novel",
+    "/m/04nh4":  "Poetry",
+    "/m/0gf28":  "Young adult",
+    "/m/04g_wd": "Dystopian",
+    "/m/039vk":  "Biography",
+    "/m/0hfjk":  "Autobiography",
+    "/m/01jfsb":  "Literary fiction",
+    "/m/03ff00": "Speculative fiction",
+    "/m/016lj8": "Historical fiction",
+    "/m/02n4kr": "Satire",
+    "/m/03mfnf": "Spy fiction",
+    "/m/0hwxm":  "Political fiction",
+    "/m/02yq81": "Psychological fiction",
+    "/m/06mq7":  "Philosophical fiction",
+    "/m/06gtzk": "Epistolary novel",
+    "/m/08sdrw": "Erotic fiction",
+    "/m/0d6gr":  "Paranormal romance",
+    "/m/098tmk": "Urban fantasy",
+    "/m/08w0_f": "Hard science fiction",
+    "/m/016475": "Social science fiction",
+    "/m/012jgz": "Cyberpunk",
+    "/m/0lsxr":  "Steampunk",
+    "/m/01j1n2": "Space opera",
+    "/m/014dfn": "Military science fiction",
+    "/m/026llv5":"New Weird",
+    "/m/028v3":  "Absurdist fiction",
+    "/m/02ql9":  "Magical realism",
+    "/m/035qb4": "Gothic fiction",
+    "/m/05qgc":  "Suspense",
+    "/m/0707q":  "Chick lit",
+    "/m/017rf8": "Family saga",
+    "/m/0127jb": "Bildungsroman",
+    "/m/017ssy": "Metafiction",
+    "/m/0hc1z":  "Postmodern literature",
+    "/m/01j1n2": "Noir fiction",
+    "/m/0xdf":   "Wuxia",
+}
+
+
+# ─── HELPER FUNCTIONS ───────────────────────────────────────────
+
+def ensure_dirs():
+    for d in [DATA_DIR, RAW_DIR, CLEAN_DIR]:
+        os.makedirs(d, exist_ok=True)
+    print(f"[OK] Direktori siap: {DATA_DIR}/")
+
+
+def download_dataset() -> bool:
+    if os.path.exists(RAW_FILE):
+        print(f"[SKIP] Dataset CMU sudah ada: {RAW_FILE}")
+        return True
+    print("[DOWNLOAD] Mengunduh CMU Book Summary Dataset...")
+    try:
+        resp = requests.get(DATASET_URL, stream=True, timeout=30)
+        resp.raise_for_status()
+        total = int(resp.headers.get("content-length", 0))
+        with open(RAW_FILE, "wb") as f, tqdm(
+            total=total, unit="B", unit_scale=True, desc="booksummaries"
+        ) as bar:
+            for chunk in resp.iter_content(chunk_size=8192):
+                f.write(chunk)
+                bar.update(len(chunk))
+        print(f"[OK] Download selesai: {RAW_FILE}")
+        return True
+    except Exception as e:
+        print(f"[WARN] Download gagal: {e}")
+        return False
+
+
+def load_cmu_dataset() -> pd.DataFrame | None:
+    """
+    Parse CMU Book Summary (tab-separated di dalam tar.gz).
+    Format: WikiID \\t FreebaseID \\t Title \\t Author \\t Date \\t Genres \\t Summary
+    """
+    import tarfile
+    records = []
+    try:
+        with tarfile.open(RAW_FILE, "r:gz") as tar:
+            for member in tar.getmembers():
+                if member.name.endswith(".txt"):
+                    f = tar.extractfile(member)
+                    if f:
+                        content = f.read().decode("utf-8", errors="replace")
+                        for line in content.strip().split("\n"):
+                            parts = line.split("\t")
+                            if len(parts) >= 7:
+                                records.append(parts)
+        df = pd.DataFrame(records, columns=[
+            "wiki_id", "freebase_id", "title", "author",
+            "pub_date", "genres_raw", "summary"
+        ])
+        print(f"[OK] Loaded {len(df)} buku dari CMU dataset")
+        return df
+    except Exception as e:
+        print(f"[WARN] Gagal parse CMU dataset: {e}")
+        return None
+
+
+def parse_genres(raw_genres_str: str) -> str:
+    """
+    Parse genre dari format CMU dataset ke string bersih dipisah '|'.
+
+    CMU menyimpan genre sebagai Python dict literal dengan Freebase ID sebagai key:
+      {'/m/02xlf': 'Fiction', '/m/0hn10': 'Novel'}
+
+    Masalah lama: json.loads() gagal karena single-quote, lalu fallback regex
+    menangkap Freebase ID (/m/02xlf) bukan nama genre-nya.
+
+    Solusi berlapis:
+      1. ast.literal_eval() → parse dict Python natively (handle single-quote)
+         → ambil VALUES (nama genre), buang KEYS (Freebase ID)
+         → jika value masih berupa Freebase ID, lookup ke FREEBASE_GENRE_MAP
+      2. Fallback regex → ambil teks di antara tanda kutip,
+         filter yang berpola /m/xxxxx dan panjang < 3 karakter
+    """
+    if not isinstance(raw_genres_str, str) or not raw_genres_str.strip():
+        return "Lainnya"
+
+    # ── Coba ast.literal_eval ────────────────────────────────────
+    try:
+        parsed = ast.literal_eval(raw_genres_str)
+        if isinstance(parsed, dict):
+            genres = []
+            for k, v in parsed.items():
+                v = str(v).strip()
+                k = str(k).strip()
+
+                if v.startswith("/m/"):
+                    # Value adalah Freebase ID → cari di lookup table
+                    mapped = FREEBASE_GENRE_MAP.get(v, "")
+                    if mapped:
+                        genres.append(mapped)
+                    # Jika tidak ada di tabel, buang (jangan tampilkan /m/xxx)
+                elif len(v) > 2:
+                    genres.append(v)
+
+            if genres:
+                return "|".join(genres[:3])
+    except Exception:
+        pass
+
+    # ── Fallback: regex ──────────────────────────────────────────
+    # Tangkap semua string di antara tanda kutip tunggal atau ganda
+    matches = re.findall(r"['\"]([^'\"]{3,})['\"]", raw_genres_str)
+    genres  = [
+        m for m in matches
+        if not m.startswith("/m/")       # Buang Freebase ID
+        and not re.match(r'^/\w', m)     # Buang path-like string
+    ]
+    return "|".join(genres[:3]) if genres else "Lainnya"
+
+
+def clean_text(text: str) -> str:
+    """Normalisasi whitespace dan hapus karakter aneh."""
+    if not isinstance(text, str):
+        return ""
+    text = re.sub(r'\s+', ' ', text)
+    text = re.sub(r'[^\w\s.,!?\'\-]', ' ', text)
+    return text.strip()
+
+
+def detect_language_simple(text: str) -> str:
+    """
+    Deteksi bahasa dua lapis berdasarkan kata penanda Indonesia.
+
+    Lapis 1 — Kata EKSKLUSIF Indonesia (satu saja → langsung "id"):
+      Hampir tidak mungkin muncul di teks bahasa Inggris murni.
+
+    Lapis 2 — Kata UMUM Indonesia (butuh ≥4 berbeda → "id"):
+      Bisa muncul kebetulan di teks EN (nama tempat, dll).
+    """
+    if not isinstance(text, str):
+        return "en"
+
+    tokens = set(text.lower().split())
+
+    id_exclusive = {
+        "nya", "pun", "juga", "sudah", "belum", "agar", "namun",
+        "tetapi", "supaya", "sedangkan", "meskipun", "walaupun",
+        "bahwa", "karena", "ketika", "setelah", "sebelum", "sehingga",
+    }
+    if tokens & id_exclusive:
+        return "id"
+
+    id_common = {
+        "yang", "dan", "di", "ini", "itu", "dengan", "untuk",
+        "dari", "ke", "ada", "tidak", "akan", "ia", "mereka",
+        "kita", "kamu", "kami", "pada", "oleh", "dalam", "adalah",
+    }
+    return "id" if len(tokens & id_common) >= 4 else "en"
+
+
+# ─── DATASET BUKU INDONESIA (KURASI MANUAL) ─────────────────────
+
+def generate_indonesian_books() -> pd.DataFrame:
+    """
+    18 buku Indonesia yang dikurasi manual sebagai fallback
+    jika gramedia_scraped.csv tidak tersedia.
+    Tersebar di 4 tingkat kompleksitas agar heuristik +5 poin
+    bisa bekerja dalam satu genre.
+    """
+    books = [
+        # Anak / Remaja
+        {"title":"Diary Si Bocah Tengil","author":"Jeff Kinney",
+         "genre":"Anak|Humor|Fiksi","language":"id",
+         "summary":"Greg Heffley menulis buku harian tentang kehidupan sekolah menengahnya yang penuh kekacauan. Ia berusaha menjadi populer di antara teman-temannya. Kisah ringan dan lucu yang sangat digemari pembaca muda Indonesia."},
+        {"title":"Hafalan Shalat Delisa","author":"Tere Liye",
+         "genre":"Fiksi|Inspirasi|Religi","language":"id",
+         "summary":"Delisa, gadis kecil di Aceh, menghafal shalat sebagai hadiah ulang tahun untuk ibunya. Tsunami 2004 merenggut keluarganya. Kisah tentang keteguhan iman, kesabaran, dan cinta seorang anak yang menghadapi bencana terbesar dalam hidupnya."},
+        {"title":"Si Anak Kampoeng","author":"Masri Sareb Putra",
+         "genre":"Anak|Inspirasi|Biografi","language":"id",
+         "summary":"Kisah masa kecil seorang anak kampung di pedalaman Kalimantan yang berjuang mendapatkan pendidikan. Dengan semangat pantang menyerah, ia melewati berbagai rintangan untuk meraih cita-cita dan membuktikan bahwa asal usul bukan penghalang kesuksesan."},
+        # Fiksi populer
+        {"title":"Laskar Pelangi","author":"Andrea Hirata",
+         "genre":"Fiksi|Drama|Inspirasi","language":"id",
+         "summary":"Kisah sepuluh anak kampung di Belitung yang berjuang mendapatkan pendidikan di sekolah SD Muhammadiyah yang hampir roboh. Ikal dan sahabat-sahabatnya memiliki mimpi besar meski hidup dalam keterbatasan. Guru Muslimah menjadi inspirasi utama yang membentuk karakter mereka."},
+        {"title":"Negeri 5 Menara","author":"Ahmad Fuadi",
+         "genre":"Fiksi|Inspirasi|Drama","language":"id",
+         "summary":"Alif meninggalkan Minangkabau untuk belajar di Pondok Pesantren Madani. Bersama lima sahabat dari berbagai penjuru Indonesia, ia bermimpi tentang dunia yang lebih luas. Moto man jadda wajada menjadi semangat mereka untuk meraih mimpi setinggi menara dunia."},
+        {"title":"Perahu Kertas","author":"Dee Lestari",
+         "genre":"Romansa|Fiksi|Drama","language":"id",
+         "summary":"Kugy dan Keenan bertemu di Bandung dan terhubung melalui kreativitas dan mimpi bersama. Kugy seorang penulis cerita dongeng yang unik, Keenan seorang pelukis berbakat. Perjalanan cinta mereka diuji oleh jarak, waktu, dan tuntutan dunia nyata."},
+        {"title":"Sang Pemimpi","author":"Andrea Hirata",
+         "genre":"Fiksi|Inspirasi|Drama","language":"id",
+         "summary":"Kelanjutan kisah Laskar Pelangi. Ikal dan Arai bermimpi kuliah di Universitas Sorbonne Paris. Mereka bekerja keras sebagai kuli ikan di pasar untuk membiayai sekolah. Persahabatan, cinta, dan tekad menjadi tema sentral cerita remaja yang mengharukan ini."},
+        {"title":"Hujan","author":"Tere Liye",
+         "genre":"Fiksi Ilmiah|Romansa|Drama","language":"id",
+         "summary":"Di masa depan, teknologi memungkinkan manusia menghapus kenangan menyakitkan. Lail harus memilih antara melupakan Esok atau menyimpan semua kenangan pedih bersamanya. Sebuah kisah tentang cinta, kehilangan, dan keberanian menghadapi masa lalu."},
+        {"title":"Dilan: Dia adalah Dilanku Tahun 1990","author":"Pidi Baiq",
+         "genre":"Romansa|Fiksi|Drama","language":"id",
+         "summary":"Milea, siswi pindahan dari Jakarta, bertemu Dilan di Bandung tahun 1990. Dilan, anggota geng motor yang cerdas dan jenaka, mendekatinya dengan cara-cara unik yang tak terlupakan. Kisah cinta remaja yang hangat dan penuh humor khas anak muda era 90-an."},
+        # Fiksi menengah
+        {"title":"Ronggeng Dukuh Paruk","author":"Ahmad Tohari",
+         "genre":"Fiksi Sejarah|Drama|Sastra","language":"id",
+         "summary":"Srintil menjadi ronggeng di dukuh terpencil dan mencintai Rasus dengan segenap jiwa. Kisah ini berlatar peristiwa G30S 1965, menggambarkan bagaimana masyarakat desa sederhana terseret arus politik besar yang tidak mereka pahami. Novel peraih berbagai penghargaan sastra bergengsi Indonesia."},
+        {"title":"Pulang","author":"Leila S. Chudori",
+         "genre":"Fiksi Sejarah|Drama|Sastra","language":"id",
+         "summary":"Dimas Suryo terjebak di Paris saat G30S 1965 meletus dan tidak bisa pulang ke Indonesia. Anaknya, Lintang, tumbuh di Prancis sambil mencoba memahami identitas dan masa lalu ayahnya. Novel yang menggambarkan diaspora, trauma sejarah, dan kerinduan akan tanah air."},
+        {"title":"Supernova: Ksatria, Puteri, dan Bintang Jatuh","author":"Dee Lestari",
+         "genre":"Fiksi Ilmiah|Romansa|Sastra","language":"id",
+         "summary":"Dimas dan Reuben menulis novel tentang ksatria dan puteri sebagai proyek rahasia mereka. Kisah fiksi yang mereka tulis secara misterius paralel dengan kehidupan nyata Ferre dan Rana di Jakarta. Novel ini memadukan fisika kuantum, spiritualitas, dan romansa dalam narasi berlapis yang inovatif."},
+        {"title":"Tenggelamnya Kapal Van der Wijck","author":"Hamka",
+         "genre":"Romansa|Drama|Sastra","language":"id",
+         "summary":"Zainuddin, pemuda Makassar berdarah Minang, jatuh cinta pada Hayati di ranah Minang. Namun perbedaan adat dan status sosial memisahkan mereka. Kisah cinta tragis yang berlatar adat Minangkabau dan kritik terhadap feodalisme, ditulis dengan bahasa puitis yang kaya oleh ulama besar Hamka."},
+        # Sastra / Sejarah
+        {"title":"Bumi Manusia","author":"Pramoedya Ananta Toer",
+         "genre":"Fiksi Sejarah|Drama|Sastra","language":"id",
+         "summary":"Novel pertama dari Tetralogi Buru karya Pramoedya Ananta Toer. Minke, pribumi terpelajar di era kolonial Belanda akhir abad 19, jatuh cinta pada Annelies Mellema. Kisah ini menggambarkan pertentangan kelas, kolonialisme, dan kebangkitan kesadaran nasional di Hindia Belanda awal abad 20 dengan narasi yang kuat dan penuh kritik sosial tajam."},
+        {"title":"Cantik Itu Luka","author":"Eka Kurniawan",
+         "genre":"Fiksi Magis|Drama|Sastra","language":"id",
+         "summary":"Dewi Ayu, perempuan cantik yang dipaksa menjadi pelacur di era kolonial, mengutuk anaknya yang keempat agar lahir buruk rupa. Novel ini menggunakan realisme magis untuk menceritakan luka sejarah Indonesia mulai era penjajahan hingga Orde Baru dengan teknik narasi yang kompleks dan simbolisme yang kaya makna."},
+        {"title":"Anak Semua Bangsa","author":"Pramoedya Ananta Toer",
+         "genre":"Fiksi Sejarah|Drama|Sastra","language":"id",
+         "summary":"Novel kedua Tetralogi Buru. Minke memperluas pandangan dunianya dengan mempelajari sejarah perjuangan bangsa-bangsa lain melawan kolonialisme Eropa. Ia mulai memahami bahwa perjuangan melawan penindasan bukan hanya milik satu bangsa, tetapi merupakan perjuangan universal seluruh umat manusia yang terjajah."},
+        # Non-fiksi / Akademis
+        {"title":"Sejarah Tuhan","author":"Karen Armstrong",
+         "genre":"Non-fiksi|Sejarah|Filsafat","language":"id",
+         "summary":"Armstrong menelusuri sejarah konsep Tuhan dalam tiga agama Abrahamik selama empat ribu tahun. Dengan analisis komparatif yang mendalam, buku ini mengkaji bagaimana pemahaman manusia tentang Yang Ilahi berevolusi merespons konteks sejarah, budaya, dan kebutuhan spiritual masing-masing zaman."},
+        {"title":"Negara Paripurna","author":"Yudi Latif",
+         "genre":"Non-fiksi|Politik|Akademis","language":"id",
+         "summary":"Kajian mendalam tentang historisitas, rasionalitas, dan aktualitas Pancasila sebagai dasar negara Indonesia. Latif menelusuri akar intelektual dan historis setiap sila, menganalisis konteks perdebatan para founding fathers, serta menawarkan tafsir kontemporer yang relevan untuk Indonesia masa kini."},
+    ]
+    df = pd.DataFrame(books)
+    df.insert(0, "book_id", range(1, len(df) + 1))
+    df["complexity_score"] = np.nan
+    print(f"[OK] Dataset Indonesia kurasi manual: {len(df)} buku")
+    return df
+
+
+def load_gramedia_scraped() -> pd.DataFrame | None:
+    """
+    Load CSV hasil scraping Gramedia dari data/raw/gramedia_scraped.csv.
+    Validasi dan normalisasi kolom agar sesuai format pipeline.
+    """
+    if not os.path.exists(GRAMEDIA_FILE):
+        print(f"[INFO] gramedia_scraped.csv tidak ditemukan di {GRAMEDIA_FILE}")
+        print("       Menggunakan dataset kurasi manual sebagai fallback.")
+        return None
+
+    try:
+        df = pd.read_csv(GRAMEDIA_FILE, encoding="utf-8-sig")
+        print(f"[OK] Loaded {len(df)} buku dari gramedia_scraped.csv")
+
+        # Pastikan kolom wajib ada
+        required = {"title", "summary"}
+        missing  = required - set(df.columns)
+        if missing:
+            print(f"[WARN] Kolom wajib tidak ada: {missing} — skip file ini")
+            return None
+
+        # Isi kolom yang mungkin tidak ada dengan nilai default
+        if "author"   not in df.columns: df["author"]   = ""
+        if "genre"    not in df.columns: df["genre"]    = "Fiksi"
+        if "language" not in df.columns: df["language"] = "id"
+
+        # Bersihkan teks
+        df["title"]   = df["title"].apply(clean_text)
+        df["author"]  = df["author"].apply(clean_text)
+        df["summary"] = df["summary"].apply(clean_text)
+
+        # Buang baris dengan sinopsis terlalu pendek
+        before = len(df)
+        df = df[df["summary"].str.len() > 50].copy()
+        print(f"[OK] Setelah filter sinopsis pendek: {len(df)} buku "
+              f"(dibuang {before - len(df)})")
+
+        df["complexity_score"] = np.nan
+        return df
+
+    except Exception as e:
+        print(f"[WARN] Gagal baca gramedia_scraped.csv: {e}")
+        return None
+
+
+# ─── DEDUPLICATION ───────────────────────────────────────────────
+
+def deduplicate(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Hapus buku duplikat berdasarkan judul yang dinormalisasi.
+    Normalisasi: lowercase, hapus tanda baca, strip whitespace.
+    Prioritas: pertahankan baris pertama (buku Indonesia didahulukan
+    karena df_id di-concat lebih dulu).
+    """
+    def norm(title: str) -> str:
+        if not isinstance(title, str):
+            return ""
+        return re.sub(r'[^\w\s]', '', title.lower()).strip()
+
+    df = df.copy()
+    df["_norm_title"] = df["title"].apply(norm)
+    before = len(df)
+    df = df.drop_duplicates(subset=["_norm_title"], keep="first")
+    df = df.drop(columns=["_norm_title"])
+    removed = before - len(df)
+    if removed:
+        print(f"[DEDUP] Hapus {removed} duplikat judul")
+    return df
+
+
+# ─── PIPELINE UTAMA ─────────────────────────────────────────────
+
+def preprocess_pipeline() -> pd.DataFrame:
+    ensure_dirs()
+    print("\n" + "="*58)
+    print("  PETA JALAN LITERASI - STEP 1: PRA-PEMROSESAN DATA")
+    print("="*58)
+
+    # ── 1. Dataset Buku Indonesia ────────────────────────────────
+    # Prioritas: gramedia_scraped.csv > kurasi manual
+    print("\n[BAGIAN 1] Memuat dataset buku Indonesia...")
+    df_id = load_gramedia_scraped()
+    if df_id is None:
+        df_id = generate_indonesian_books()
+
+    # Pastikan kolom language terisi "id"
+    df_id["language"] = df_id.get("language", pd.Series(["id"] * len(df_id)))
+    df_id["language"] = df_id["language"].fillna("id")
+
+    print(f"           Total buku Indonesia: {len(df_id)}")
+
+    # ── 2. Dataset Buku Inggris (CMU) ───────────────────────────
+    print("\n[BAGIAN 2] Memuat dataset buku Inggris (CMU)...")
+    download_ok = download_dataset()
+    df_en       = None
+
+    if download_ok:
+        df_raw = load_cmu_dataset()
+        if df_raw is not None and len(df_raw) > 0:
+            print("[PROSES] Membersihkan dan memformat dataset CMU...")
+
+            df_en = pd.DataFrame()
+            df_en["title"]   = df_raw["title"].apply(clean_text)
+            df_en["author"]  = df_raw["author"].apply(clean_text)
+            df_en["summary"] = df_raw["summary"].apply(clean_text)
+
+            # Parse genre — ini yang fix masalah /m/xxxxx
+            print("[PROSES] Parsing genre CMU (fix Freebase ID)...")
+            df_en["genre"] = df_raw["genres_raw"].apply(parse_genres)
+
+            # Deteksi bahasa dari sinopsis
+            print("[PROSES] Mendeteksi bahasa buku CMU...")
+            tqdm.pandas(desc="Deteksi Bahasa")
+            df_en["language"] = df_en["summary"].progress_apply(detect_language_simple)
+
+            # Filter hanya English (buku ID sudah dari Gramedia/kurasi)
+            df_en = df_en[df_en["language"] == "en"]
+            df_en = df_en[df_en["summary"].str.len() > 50]
+            df_en["complexity_score"] = np.nan
+
+            # Buang buku yang genrenya masih "Lainnya" DAN sinopsisnya pendek
+            # (biasanya entri sampah dari CMU)
+            df_en = df_en[
+                ~((df_en["genre"] == "Lainnya") & (df_en["summary"].str.len() < 100))
+            ]
+
+            # Sampel agar tidak terlalu besar
+            df_en = df_en.sample(
+                n=min(MAX_EN_BOOKS, len(df_en)), random_state=42
+            ).reset_index(drop=True)
+
+            print(f"           Total buku Inggris: {len(df_en)}")
+
+    if df_en is None or len(df_en) == 0:
+        print("[WARN] Tidak ada data EN dari CMU — hanya pakai data ID")
+        df_en = pd.DataFrame(columns=list(df_id.columns))
+
+    # ── 3. Gabungkan ID + EN ────────────────────────────────────
+    print("\n[BAGIAN 3] Menggabungkan dataset ID + EN...")
+
+    # Samakan kolom sebelum concat
+    for col in COLUMNS_OUT:
+        if col not in df_id.columns: df_id[col] = np.nan
+        if col not in df_en.columns: df_en[col] = np.nan
+
+    # ID diletakkan di atas agar duplikat yang dipertahankan adalah versi ID
+    df_merged = pd.concat(
+        [df_id[COLUMNS_OUT], df_en[COLUMNS_OUT]],
+        ignore_index=True
+    )
+
+    # ── 4. Deduplikasi & Reset book_id ──────────────────────────
+    df_merged = deduplicate(df_merged)
+    df_merged["book_id"]          = range(1, len(df_merged) + 1)
+    df_merged["complexity_score"] = np.nan
+
+    # ── 5. Validasi genre — buang sisa /m/xxxxx yang lolos ──────
+    # Double-check: filter baris yang genrenya masih mengandung /m/
+    before = len(df_merged)
+    mask_bad_genre = df_merged["genre"].str.contains(r'/m/', na=False)
+    if mask_bad_genre.any():
+        # Coba remap dulu
+        df_merged.loc[mask_bad_genre, "genre"] = (
+            df_merged.loc[mask_bad_genre, "genre"]
+            .apply(lambda g: "|".join(
+                FREEBASE_GENRE_MAP.get(part.strip(), "")
+                for part in g.split("|")
+                if FREEBASE_GENRE_MAP.get(part.strip(), "")
+            ) or "Lainnya")
+        )
+        still_bad = df_merged["genre"].str.contains(r'/m/', na=False)
+        df_merged.loc[still_bad, "genre"] = "Lainnya"
+        print(f"[FIX] Genre /m/xxx diperbaiki: {mask_bad_genre.sum()} buku")
+
+    # ── 6. Simpan ───────────────────────────────────────────────
+    df_final = df_merged[COLUMNS_OUT]
+    df_final.to_csv(CLEAN_FILE, index=False, encoding="utf-8-sig")
+
+    print(f"\n{'='*58}")
+    print(f"  [SUKSES] {CLEAN_FILE}")
+    print(f"  Total buku       : {len(df_final)}")
+    print(f"  Bahasa Indonesia : {(df_final['language']=='id').sum()}")
+    print(f"  Bahasa Inggris   : {(df_final['language']=='en').sum()}")
+    n_lainnya = (df_final['genre'] == 'Lainnya').sum()
+    n_freebase = df_final['genre'].str.contains(r'/m/', na=False).sum()
+    print(f"  Genre 'Lainnya'  : {n_lainnya} buku")
+    print(f"  Genre /m/xxx     : {n_freebase} buku (seharusnya 0)")
+    print(f"{'='*58}")
+    print("\n→ Lanjutkan ke step2_complexity.py")
+    return df_final
+
+
+# ─── ENTRY POINT ────────────────────────────────────────────────
+if __name__ == "__main__":
+    df = preprocess_pipeline()
+    print("\nContoh output:")
+    print(df[["title", "author", "genre", "language"]].head(5).to_string(index=False))
+
+File step2_complexity.py
+"""
+=================================================================
+PETA JALAN LITERASI - STEP 2: HITUNG COMPLEXITY SCORE
+=================================================================
+Strategi (Opsi A):
+  - Buku BAHASA INGGRIS  → LFTK (brucewlee/lftk) dengan spaCy en_core_web_sm
+  - Buku BAHASA INDONESIA → Implementasi manual (textstat + nltk)
+    karena LFTK dirancang untuk English dan tidak ada spaCy model ID
+
+Fitur LFTK yang dipakai (dipilih berdasarkan korelasi tinggi
+dengan readability dari paper BEA @ ACL 2023):
+  Domain surface, family wordsent    : t_word, t_sent, t_uword
+  Domain surface, family avgwordsent : a_word_ps, a_char_pw
+  Domain surface, family typetokenratio : t_uword/t_word (TTR)
+  Domain surface, family readformula : Flesch-Kincaid, Gunning Fog
+
+Fitur manual untuk bahasa Indonesia (ekuivalen):
+  Rata-rata panjang kalimat & kata
+  Type-Token Ratio
+  Proporsi kata panjang (7+ karakter)
+  Rasio karakter per kata (a_char_pw)
+  Estimasi suku kata via hitung vokal (a,i,u,e,o) — proxy morfologi ID
+  Rasio suku kata per kata — pengganti Flesch/Gunning Fog yg berbasis morfologi EN
+
+Skor Akhir (0–100):
+  0–20  : Sangat Mudah
+  21–40 : Mudah
+  41–60 : Menengah
+  61–80 : Sulit
+  81–100: Sangat Sulit
+
+Jalankan: python step2_complexity.py
+=================================================================
+"""
+
+import os
+import warnings
+warnings.filterwarnings("ignore")
+
+import re
+import nltk
+import textstat
+import numpy as np
+import pandas as pd
+from tqdm import tqdm
+
+# ─── PATH ───────────────────────────────────────────────────────
+CLEAN_FILE  = os.path.join("data", "clean", "books_clean.csv")
+SCORED_FILE = os.path.join("data", "clean", "books_scored.csv")
+FEAT_FILE   = os.path.join("data", "clean", "books_features.csv")
+
+# ─── SETUP ──────────────────────────────────────────────────────
+
+def setup_nltk():
+    for path, name in [
+        ("tokenizers/punkt_tab",                    "punkt_tab"),
+        ("corpora/stopwords",                        "stopwords"),
+        ("taggers/averaged_perceptron_tagger_eng",   "averaged_perceptron_tagger_eng"),
+    ]:
+        try:
+            nltk.data.find(path)
+        except LookupError:
+            print(f"[NLTK] Downloading {name}...")
+            nltk.download(name, quiet=True)
+
+
+def load_spacy_and_lftk():
+    """
+    Load spaCy en_core_web_sm dan modul lftk.
+    Return (nlp, lftk_module) atau (None, None) jika gagal.
+    """
+    try:
+        import spacy
+        import lftk
+        try:
+            nlp = spacy.load("en_core_web_sm")
+            print("[OK] spaCy en_core_web_sm loaded")
+        except OSError:
+            print("[INFO] Mengunduh en_core_web_sm...")
+            os.system("python -m spacy download en_core_web_sm")
+            nlp = spacy.load("en_core_web_sm")
+            print("[OK] spaCy en_core_web_sm loaded")
+        return nlp, lftk
+    except ImportError as e:
+        print(f"[WARN] LFTK/spaCy tidak tersedia: {e}")
+        print("       Buku EN akan pakai fallback manual.")
+        return None, None
+
+
+# ─── FEATURE KEYS LFTK YANG KITA PAKAI ─────────────────────────
+# Dipilih dari family yang language="general" atau "en",
+# relevan untuk readability, dan ringan di CPU.
+#
+# Referensi kode asli LFTK (brucewlee/lftk):
+#   LFTK = lftk.Extractor(docs=doc)
+#   LFTK.customize(stop_words=True, punctuations=False, round_decimal=3)
+#   features = LFTK.extract(features=LFTK_FEATURE_KEYS)
+#
+LFTK_FEATURE_KEYS = [
+    # surface > wordsent (foundation)
+    "t_word",       # total number of words
+    "t_uword",      # total number of unique words
+    "t_sent",       # total number of sentences
+    "t_char",       # total number of characters
+    # surface > avgwordsent (derivation)
+    "a_word_ps",    # average words per sentence
+    "a_char_pw",    # average characters per word
+    # surface > typetokenratio
+    "t_uword",      # dipakai ulang untuk TTR = t_uword / t_word
+    # surface > readformula (English only)
+    "a_kup_pw",     # average Kuperman Age-of-Acquisition per word
+]
+
+# Subset yang language="general" (aman untuk semua bahasa jika perlu)
+LFTK_GENERAL_KEYS = [
+    "t_word", "t_uword", "t_sent", "t_char",
+    "a_word_ps", "a_char_pw",
+]
+
+
+# ─── EXTRACTOR BAHASA INGGRIS (LFTK) ────────────────────────────
+
+class EnglishExtractor:
+    """
+    Ekstrak fitur linguistik untuk teks bahasa Inggris menggunakan LFTK.
+    Cara pakai LFTK (dari source asli brucewlee/lftk):
+
+      doc  = nlp(text)                          # spaCy doc
+      LFTK = lftk.Extractor(docs=doc)           # inisialisasi
+      LFTK.customize(stop_words=True,           # sertakan stopword
+                     punctuations=False,         # exclude tanda baca
+                     round_decimal=3)
+      feat = LFTK.extract(features=keys)        # dict hasil ekstraksi
+    """
+
+    def __init__(self, nlp, lftk_module):
+        self.nlp  = nlp
+        self.lftk = lftk_module
+
+        # Ambil semua feature key yang tersedia dari LFTK
+        # (search_features adalah fungsi di lftk module langsung)
+        try:
+            all_keys = self.lftk.search_features(
+                language="general", return_format="list_key"
+            )
+            # Tambah readformula (English-only, aman karena kita sudah di blok EN)
+            read_keys = self.lftk.search_features(
+                family="readformula", return_format="list_key"
+            )
+            self.feature_keys = list(dict.fromkeys(all_keys + read_keys))
+            print(f"[LFTK] {len(self.feature_keys)} feature keys loaded")
+        except Exception:
+            self.feature_keys = LFTK_GENERAL_KEYS
+
+    def extract(self, text: str) -> dict:
+        if not isinstance(text, str) or len(text.strip()) < 20:
+            return self._fallback(text)
+        try:
+            # Batasi panjang teks agar ringan di CPU (sinopsis biasanya <500 kata)
+            doc = self.nlp(text[:3000])
+
+            LFTK_extractor = self.lftk.Extractor(docs=doc)
+            LFTK_extractor.customize(
+                stop_words=True,      # hitung stopword
+                punctuations=False,   # abaikan tanda baca
+                round_decimal=3
+            )
+            features = LFTK_extractor.extract(features=self.feature_keys)
+
+            # Hitung TTR manual dari hasil LFTK
+            t_word  = features.get("t_word",  1) or 1
+            t_uword = features.get("t_uword", 1) or 1
+            features["ttr"] = round(t_uword / t_word, 3)
+
+            return features
+
+        except Exception as e:
+            return self._fallback(text)
+
+    def _fallback(self, text: str) -> dict:
+        """Fallback ke manual jika LFTK gagal — pakai stopword EN, bukan ID."""
+        return IndonesianExtractor._extract_manual(text, lang="en")
+
+
+# ─── EXTRACTOR BAHASA INDONESIA (MANUAL) ────────────────────────
+
+# Vokal bahasa Indonesia — dipakai untuk estimasi jumlah suku kata.
+# Bahasa Indonesia bersifat aglutinatif dan pola suku katanya
+# sangat teratur: umumnya (K)V atau (K)VK, sehingga menghitung
+# vokal adalah proxy suku kata yang jauh lebih akurat daripada
+# algoritma Flesch/Gunning Fog yang berbasis morfologi bahasa Inggris.
+VOWELS_ID = set("aiueoAIUEO")
+
+# Stopword bahasa Indonesia (manual, karena NLTK tidak punya korpus ID)
+STOPWORDS_ID = {
+    "yang", "dan", "di", "ini", "itu", "dengan", "untuk", "dari",
+    "ke", "ada", "tidak", "juga", "sudah", "akan", "ia", "mereka",
+    "kita", "kamu", "kami", "pada", "oleh", "dalam", "sebuah",
+    "satu", "dua", "tiga", "bisa", "harus", "adalah", "tersebut",
+    "saat", "jika", "maka", "namun", "tetapi", "karena", "seperti",
+    "bahwa", "atau", "nya", "pun", "pula", "lalu", "kemudian",
+    "ketika", "setelah", "sebelum", "antara", "hingga", "sampai",
+    "meski", "walaupun", "agar", "supaya", "melalui", "tentang",
+}
+
+
+def count_vowels_id(word: str) -> int:
+    """
+    Hitung jumlah vokal dalam satu kata sebagai estimasi jumlah suku kata.
+    Contoh:
+      "buku"        → 2 vokal (bu-ku)          → 2 suku kata
+      "membaca"     → 3 vokal (mem-ba-ca)       → 3 suku kata
+      "pembelajaran"→ 6 vokal (pem-be-la-jar-an)→ 5 suku kata (approx)
+    Ini lebih valid untuk bahasa Indonesia daripada algoritma Flesch
+    yang menghitung suku kata berdasarkan pola konsonan kluster EN.
+    """
+    return sum(1 for ch in word if ch in VOWELS_ID)
+
+
+class IndonesianExtractor:
+    """
+    Ekstrak fitur linguistik untuk teks bahasa Indonesia secara manual.
+    LFTK tidak digunakan karena tidak ada model spaCy khusus bahasa ID.
+
+    Pengganti Flesch Reading Ease & Gunning Fog (keduanya berbasis
+    morfologi bahasa Inggris):
+      → avg_vowels_pw  : rata-rata vokal per kata (proxy suku kata ID)
+      → vowel_ratio    : rasio vokal / total karakter (kepadatan fonetik)
+      → syllable_complexity : rasio kata dengan ≥4 vokal (kata panjang/kompleks)
+
+    Fitur lain tetap ekuivalen dengan output LFTK untuk EN.
+    """
+
+    def extract(self, text: str) -> dict:
+        return self._extract_manual(text, lang="id")
+
+    @staticmethod
+    def _extract_manual(text: str, lang: str = "id") -> dict:
+        """
+        Ekstrak fitur linguistik secara manual.
+
+        Args:
+            text : teks sinopsis buku
+            lang : "id" → stopword Indonesia
+                   "en" → stopword Inggris dari NLTK
+                   (dipakai saat dipanggil sebagai fallback EnglishExtractor)
+        """
+        if not isinstance(text, str) or len(text.strip()) < 20:
+            return IndonesianExtractor._empty()
+
+        # Pilih stopword sesuai bahasa
+        if lang == "en":
+            try:
+                stop_words = set(nltk.corpus.stopwords.words("english"))
+            except Exception:
+                stop_words = set()
+        else:
+            stop_words = STOPWORDS_ID
+
+        # Tokenisasi kalimat
+        try:
+            sentences = nltk.sent_tokenize(text)
+        except Exception:
+            sentences = [s.strip() for s in text.split(".") if s.strip()]
+
+        words = re.findall(r'\b[a-zA-Z\u00C0-\u024F]+\b', text.lower())
+
+        if not words:
+            return IndonesianExtractor._empty()
+
+        t_word  = len(words)
+        t_uword = len(set(words))
+        t_sent  = max(len(sentences), 1)
+        t_char  = sum(len(w) for w in words)
+
+        # Ekuivalen a_word_ps (LFTK: average words per sentence)
+        sent_word_counts = [
+            len(re.findall(r'\b[a-zA-Z\u00C0-\u024F]+\b', s))
+            for s in sentences
+            if s.strip()
+        ]
+        a_word_ps = float(np.mean(sent_word_counts)) if sent_word_counts else float(t_word)
+
+        # Ekuivalen a_char_pw (LFTK: average characters per word)
+        a_char_pw = t_char / t_word if t_word else 0.0
+
+        # TTR (ekuivalen t_uword/t_word dari LFTK)
+        ttr = t_uword / t_word if t_word else 0.0
+
+        # Stopword count — stopword disesuaikan dengan lang
+        t_stopword = sum(1 for w in words if w in stop_words)
+
+        # Proporsi kata panjang (7+ karakter) — proxy leksikal
+        long_word_ratio = sum(1 for w in words if len(w) >= 7) / t_word
+
+        # ── Fitur berbasis suku kata (khusus/lebih valid untuk ID) ──
+        # Flesch & Gunning Fog TIDAK dipakai untuk ID karena algoritma
+        # mereka menghitung suku kata via pola kluster konsonan EN.
+        # Sebagai gantinya kita hitung vokal langsung dengan regex.
+
+        vowel_counts = [count_vowels_id(w) for w in words]
+
+        # Rata-rata vokal per kata → proxy "panjang suku kata"
+        avg_vowels_pw = float(np.mean(vowel_counts)) if vowel_counts else 0.0
+
+        # Rasio total vokal / total karakter → kepadatan fonetik
+        total_vowels = sum(vowel_counts)
+        vowel_ratio  = total_vowels / t_char if t_char else 0.0
+
+        # Proporsi kata dengan ≥4 vokal → kata multi-suku-kata / kompleks
+        syllable_complexity = sum(1 for v in vowel_counts if v >= 4) / t_word
+
+        # ── TAMBAHAN: Flesch & Gunning Fog untuk Fallback EN ──
+        # Gunakan textstat jika teksnya Inggris agar compute_score tidak error
+        fre_score = 50.0
+        gfi_score = 10.0
+        if lang == "en":
+            try:
+                fre_score = textstat.flesch_reading_ease(text)
+                gfi_score = textstat.gunning_fog(text)
+            except Exception:
+                pass
+
+        return {
+            # ── Fitur universal (nama key sejajar dengan output LFTK) ──
+            "t_word":              t_word,
+            "t_uword":             t_uword,
+            "t_sent":              t_sent,
+            "t_char":              t_char,
+            "t_stopword":          t_stopword,
+            "a_word_ps":           round(a_word_ps, 3),
+            "a_char_pw":           round(a_char_pw, 3),
+            "ttr":                 round(ttr, 3),
+            "long_word_ratio":     round(long_word_ratio, 3),
+            # ── Fitur suku kata (pengganti Flesch/Gunning Fog untuk ID) ──
+            "avg_vowels_pw":       round(avg_vowels_pw, 3),
+            "vowel_ratio":         round(vowel_ratio, 3),
+            "syllable_complexity": round(syllable_complexity, 3),
+            # ── Fitur Fallback EN (textstat) ──
+            "fre":                 fre_score,
+            "gfi":                 gfi_score,
+        }
+
+    @staticmethod
+    def _empty() -> dict:
+        return {
+            "t_word": 0, "t_uword": 0, "t_sent": 1, "t_char": 0,
+            "t_stopword": 0, "a_word_ps": 10.0, "a_char_pw": 5.0,
+            "ttr": 0.5, "long_word_ratio": 0.2,
+            "avg_vowels_pw": 2.5, "vowel_ratio": 0.4,
+            "syllable_complexity": 0.15,
+            "fre": 50.0, "gfi": 10.0,
+        }
+
+
+# ─── COMPUTE COMPLEXITY SCORE (UNIFIED) ─────────────────────────
+
+def compute_complexity_score(features: dict, lang: str) -> float:
+    """
+    Hitung skor kompleksitas 0–100 dari dict fitur.
+
+    Komponen berbeda antara EN dan ID:
+
+    BAHASA INGGRIS (fitur dari LFTK):
+      1. Flesch Difficulty (fre, invert)    — 30%
+      2. Avg words per sentence (a_word_ps) — 20%
+      3. Avg chars per word (a_char_pw)     — 20%
+      4. TTR (type-token ratio)             — 10%
+      5. Gunning Fog (gfi)                  — 20%
+
+    BAHASA INDONESIA (fitur manual berbasis morfologi ID):
+      1. Syllable complexity (kata ≥4 vokal) — 30%  ← pengganti Flesch
+      2. Avg words per sentence (a_word_ps)  — 20%
+      3. Avg chars per word (a_char_pw)      — 20%
+      4. TTR (type-token ratio)              — 10%
+      5. Avg vowels per word (avg_vowels_pw) — 20%  ← pengganti Gunning Fog
+    """
+
+    def clip(val, lo, hi):
+        return max(lo, min(hi, float(val or 0)))
+
+    # ── Komponen 2: Avg words per sentence (sama untuk EN dan ID) ─
+    a_word_ps = features.get("a_word_ps", 15.0)
+    s_sent    = clip((a_word_ps - 5) / 35 * 100, 0, 100)
+
+    # ── Komponen 3: Avg chars per word (sama untuk EN dan ID) ─────
+    a_char_pw = features.get("a_char_pw", 5.0)
+    s_word    = clip((a_char_pw - 3) / 9 * 100, 0, 100)
+
+    # ── Komponen 4: TTR (sama untuk EN dan ID) ────────────────────
+    ttr   = features.get("ttr", 0.5)
+    s_ttr = clip((ttr - 0.2) / 0.7 * 100, 0, 100)
+
+    if lang == "en":
+        # ── EN Komponen 1: Flesch Difficulty (dari LFTK) ──────────
+        # Key LFTK untuk Flesch Reading Ease: "fre"
+        flesch_re = features.get("fre",
+                    features.get("flesch_re",
+                    features.get("flesch_reading_ease", 50.0)))
+        flesch_re = clip(flesch_re, 0, 100)
+        s_readability = 100 - flesch_re   # invert: rendah RE = sulit
+
+        # ── EN Komponen 5: Gunning Fog (dari LFTK) ────────────────
+        # Key LFTK untuk Gunning Fog Index: "gfi"
+        fog   = features.get("gfi", features.get("gunning_fog", 10.0))
+        s_fog = clip((fog - 5) / 20 * 100, 0, 100)
+
+        score = (
+            0.30 * s_readability +
+            0.20 * s_sent        +
+            0.20 * s_word        +
+            0.10 * s_ttr         +
+            0.20 * s_fog
+        )
+
+    else:
+        # ── ID Komponen 1: Syllable Complexity ────────────────────
+        # Proporsi kata dengan ≥4 vokal (kata multi-suku-kata/kompleks).
+        # Range tipikal: 0.05 (teks sangat sederhana) – 0.40 (teks akademis)
+        # Contoh tinggi: "pembelajaran", "keberhasilan", "perkembangan"
+        syl_complex = features.get("syllable_complexity", 0.15)
+        s_readability = clip(syl_complex / 0.40 * 100, 0, 100)
+
+        # ── ID Komponen 5: Avg Vowels Per Word ────────────────────
+        # Range tipikal bahasa Indonesia: 1.5 (kata pendek) – 4.5 (kata panjang)
+        # Kata sederhana: "di" (1), "dan" (1), "buku" (2)
+        # Kata kompleks:  "pembelajaran" (5), "perkembangan" (4)
+        avg_vow = features.get("avg_vowels_pw", 2.5)
+        s_fog   = clip((avg_vow - 1.5) / 3.0 * 100, 0, 100)
+
+        score = (
+            0.30 * s_readability +
+            0.20 * s_sent        +
+            0.20 * s_word        +
+            0.10 * s_ttr         +
+            0.20 * s_fog
+        )
+
+    return round(float(np.clip(score, 0, 100)), 2)
+
+
+def get_complexity_label(score: float) -> str:
+    if score <= 20:   return "Sangat Mudah"
+    elif score <= 40: return "Mudah"
+    elif score <= 60: return "Menengah"
+    elif score <= 80: return "Sulit"
+    else:             return "Sangat Sulit"
+
+
+# ─── PIPELINE UTAMA ─────────────────────────────────────────────
+
+def complexity_pipeline():
+    print("\n" + "="*60)
+    print("  PETA JALAN LITERASI - STEP 2: COMPLEXITY SCORING")
+    print("  EN: LFTK (brucewlee/lftk) | ID: Manual (textstat+nltk)")
+    print("="*60)
+
+    if not os.path.exists(CLEAN_FILE):
+        print(f"[ERROR] {CLEAN_FILE} tidak ditemukan.")
+        print("        Jalankan step1_preprocess.py terlebih dahulu!")
+        return None
+
+    setup_nltk()
+    df = pd.read_csv(CLEAN_FILE, encoding="utf-8-sig")
+    print(f"[OK] Loaded {len(df)} buku")
+    print(f"     Bahasa Indonesia : {(df['language']=='id').sum()}")
+    print(f"     Bahasa Inggris   : {(df['language']=='en').sum()}")
+
+    # Load LFTK + spaCy (hanya untuk buku EN)
+    nlp, lftk_module = load_spacy_and_lftk()
+    use_lftk = (nlp is not None and lftk_module is not None)
+
+    en_extractor = EnglishExtractor(nlp, lftk_module) if use_lftk else None
+    id_extractor = IndonesianExtractor()
+
+    scores   = []
+    labels   = []
+    feat_recs = []
+    en_count = id_count = lftk_count = fallback_count = 0
+
+    print(f"\n[PROSES] Menghitung complexity score...")
+    if use_lftk:
+        print(f"         Buku EN  → LFTK (API asli brucewlee/lftk)")
+    else:
+        print(f"         Buku EN  → Manual fallback (LFTK tidak tersedia)")
+    print(f"         Buku ID  → Manual (textstat + nltk)")
+
+    for _, row in tqdm(df.iterrows(), total=len(df), desc="Scoring"):
+        text = str(row.get("summary", ""))
+        lang = str(row.get("language", "en")).strip().lower()
+
+        if lang == "en":
+            en_count += 1
+            if use_lftk and en_extractor:
+                features = en_extractor.extract(text)
+                lftk_count += 1
+            else:
+                features = IndonesianExtractor._extract_manual(text, lang="en")
+                fallback_count += 1
+        else:
+            id_count += 1
+            features = id_extractor.extract(text)
+
+        score = compute_complexity_score(features, lang)
+        label = get_complexity_label(score)
+
+        scores.append(score)
+        labels.append(label)
+        feat_recs.append({
+            "book_id":    row.get("book_id", 0),
+            "language":   lang,
+            **{k: v for k, v in features.items() if not isinstance(v, (dict, list))},
+        })
+
+    df["complexity_score"] = scores
+    df["complexity_label"] = labels
+
+    # Simpan
+    df.to_csv(SCORED_FILE, index=False, encoding="utf-8-sig")
+    pd.DataFrame(feat_recs).to_csv(FEAT_FILE, index=False, encoding="utf-8-sig")
+
+    print(f"\n[SUKSES] {SCORED_FILE}")
+    print(f"         {FEAT_FILE}")
+    print(f"\n--- RINGKASAN PROSES ---")
+    print(f"  Buku EN diproses    : {en_count}")
+    if use_lftk:
+        print(f"    └─ via LFTK       : {lftk_count}")
+        print(f"    └─ via fallback   : {fallback_count}")
+    print(f"  Buku ID diproses    : {id_count}")
+    print(f"\n--- DISTRIBUSI SKOR ---")
+    print(df["complexity_label"].value_counts().to_string())
+    print(f"\n  Min  : {df['complexity_score'].min():.1f}")
+    print(f"  Max  : {df['complexity_score'].max():.1f}")
+    print(f"  Rata : {df['complexity_score'].mean():.1f}")
+    print(f"\n--- CONTOH HASIL ---")
+    sample = df[["title","language","complexity_score","complexity_label"]].head(6)
+    print(sample.to_string(index=False))
+    print("\n→ Lanjutkan ke step3_train_recommender.py")
+
+    return df
+
+
+if __name__ == "__main__":
+    df = complexity_pipeline()
+
+File step3_train_recommender.py
+"""
+=================================================================
+PETA JALAN LITERASI - STEP 3: TRAINING MODEL REKOMENDASI
+=================================================================
+Diadaptasi dari:
+  Reinalynn/Building-a-Book-Recommendation-System-using-Python
+  └─ Content filtering by vectorizing on full text (tfidf and count).ipynb
+
+Perbedaan utama dari repo asli Reinalynn:
+  ┌─────────────────────────────────────────────────────────────┐
+  │ REPO ASLI (Reinalynn)         │ ADAPTASI KITA               │
+  ├───────────────────────────────┼─────────────────────────────┤
+  │ Vectorize "full_text" =       │ Vectorize "content_text" =  │
+  │ tahun + judul + review user   │ genre (3x) + summary buku   │
+  ├───────────────────────────────┼─────────────────────────────┤
+  │ TF-IDF → cosine similarity    │ SAMA persis (kode diadopsi) │
+  │ → cari buku PALING mirip      │ TAPI: filter complexity     │
+  ├───────────────────────────────┼─────────────────────────────┤
+  │ Target: similarity = 100%     │ Target: genre mirip,        │
+  │ (maximum match)               │ complexity +3 s/d +15 poin  │
+  ├───────────────────────────────┼─────────────────────────────┤
+  │ Dataset: Goodreads 10k buku   │ Dataset: CMU/dummy ID+EN    │
+  │ Input: review_text pengguna   │ Input: summary sinopsis buku│
+  ├───────────────────────────────┼─────────────────────────────┤
+  │ Bahasa: English saja          │ Bahasa: Indonesia + English │
+  │ Lemmatizer: WordNetLemmatizer │ Lemmatizer: PorterStemmer   │
+  │ (English-specific)            │ (lebih general, cocok ID)   │
+  └───────────────────────────────┴─────────────────────────────┘
+
+Pipeline Reinalynn yang diadopsi (dari notebook-nya):
+  1. Load CSV → kolom "full_text" (kita: "content_text")
+  2. TfidfVectorizer().fit_transform(ds['full_text'])
+  3. cosine_similarity(tfidf_matrix, tfidf_matrix)
+  4. Ambil index buku dengan similarity tertinggi
+  → Kita modifikasi langkah 4: filter complexity dulu, baru rank
+
+Jalankan: python step3_train_recommender.py
+=================================================================
+"""
+
+import os
+import re
+import pickle
+import string
+import warnings
+warnings.filterwarnings("ignore")
+
+import numpy as np
+import pandas as pd
+import nltk
+from nltk.stem import PorterStemmer          # Reinalynn pakai WordNetLemmatizer (EN only)
+from Sastrawi.Stemmer.StemmerFactory import StemmerFactory # Tambahan baru
+                                              # Kita ganti PorterStemmer agar support ID juga
+from nltk.corpus import stopwords
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+
+# Inisiasi dua mesin stemmer yang berbeda
+stemmer_en = PorterStemmer()
+stemmer_id = StemmerFactory().create_stemmer()
+
+# ─── PATH ───────────────────────────────────────────────────────
+SCORED_FILE = os.path.join("data", "clean", "books_scored.csv")
+MODEL_DIR   = os.path.join("data", "model")
+MODEL_FILE  = os.path.join(MODEL_DIR, "recommender.pkl")
+
+# ─── HEURISTIK "PETA JALAN" ─────────────────────────────────────
+# Ini adalah modifikasi utama dari logika Reinalynn.
+# Reinalynn mencari yang PALING mirip (similarity tertinggi).
+# Kita mencari yang genre mirip TAPI complexity sedikit lebih tinggi.
+COMPLEXITY_MIN_DELTA = 3    # minimal +3 poin dari buku sebelumnya
+COMPLEXITY_MAX_DELTA = 15   # maksimal +15 poin (jangan terlalu jauh)
+TOP_N_DEFAULT        = 5
+
+
+# ─── TEXT PREPROCESSING ─────────────────────────────────────────
+# Diadaptasi dari fungsi clean_txt() di notebook Reinalynn.
+# Reinalynn mendefinisikan black_txt() + clean_txt() tapi akhirnya
+# memilih TIDAK menggunakannya (cell berisi "# decided not to use").
+# Kita tetap menggunakannya karena dataset kita lebih bervariasi
+# (campuran ID+EN), dan mengganti lemmatizer ke stemmer.
+
+def setup_nltk():
+    for path, name in [
+        ("tokenizers/punkt_tab", "punkt_tab"),
+        ("corpora/stopwords",    "stopwords"),
+        ("corpora/wordnet",      "wordnet"),
+    ]:
+        try:
+            nltk.data.find(path)
+        except LookupError:
+            nltk.download(name, quiet=True)
+
+
+# Stopword bahasa Indonesia (manual, NLTK tidak punya korpus ID)
+STOPWORDS_ID = {
+    "yang", "dan", "di", "ini", "itu", "dengan", "untuk", "dari",
+    "ke", "ada", "tidak", "juga", "sudah", "akan", "ia", "mereka",
+    "kita", "pada", "oleh", "dalam", "adalah", "tersebut", "saat",
+    "jika", "maka", "namun", "tetapi", "karena", "seperti", "bahwa",
+    "atau", "pun", "lalu", "kemudian", "ketika", "setelah", "sebelum",
+    "antara", "hingga", "sampai", "meski", "walaupun", "agar",
+}
+
+
+def get_stopwords(lang: str) -> set:
+    """
+    Kembalikan set stopword sesuai bahasa.
+    Dipisah per bahasa agar kata seperti "di" tidak ikut
+    dibuang saat membersihkan teks bahasa Inggris.
+
+    lang="en" → stopwords NLTK English
+    lang="id" → stopword Indonesia manual (NLTK tidak punya korpus ID)
+    """
+    if lang == "en":
+        return set(stopwords.words("english"))
+    return STOPWORDS_ID
+
+
+stemmer = PorterStemmer()
+
+
+def black_txt(token: str, stop_words: set) -> bool:
+    """
+    Filter token: bukan stopword, bukan tanda baca, panjang > 2.
+    Diadaptasi langsung dari fungsi black_txt() Reinalynn.
+    """
+    return (
+        token not in stop_words and
+        token not in list(string.punctuation) and
+        len(token) > 2
+    )
+
+
+def clean_txt(text: str, lang: str) -> str:
+    """
+    Bersihkan teks dengan Stemmer Hibrida (PySastrawi untuk ID, Porter untuk EN).
+    Stopword akan ditarik secara dinamis berdasarkan parameter 'lang'.
+    """
+    if not isinstance(text, str):
+        return ""
+
+    # Tarik stopword sesuai bahasa secara dinamis
+    stop_words = get_stopwords(lang)
+
+    text = re.sub("'", "", text)
+    text = re.sub(r"(\d|\W)+", " ", text)
+    text = text.replace("nbsp", "")
+
+    tokens = text.lower().split()
+    clean  = []
+    
+    for w in tokens:
+        if black_txt(w, stop_words):
+            # Cek bahasa untuk menentukan alat potong (stemmer)
+            if lang == "id":
+                clean.append(stemmer_id.stem(w))
+            else:
+                clean.append(stemmer_en.stem(w))
+
+    return " ".join(clean)
+
+
+def build_full_text(row: pd.Series) -> str:
+    """
+    Bangun "full_text" untuk setiap buku — analog dengan kolom
+    "full_text" di dataset Reinalynn yang berisi gabungan metadata.
+
+    Reinalynn: full_text = tahun + judul + review_text pengguna
+    Kita      : full_text = genre (bobot 3x) + summary sinopsis
+
+    Genre diulang 3x agar lebih berbobot dalam TF-IDF,
+    mengikuti prinsip field weighting yang Reinalynn terapkan
+    dengan menyertakan judul (yang juga berulang via metadata).
+    """
+    genre   = str(row.get("genre",   "")).replace("|", " ")
+    summary = str(row.get("summary", ""))
+    return f"{genre} {genre} {genre} {summary}"
+
+
+
+# ─── MODEL KELAS ────────────────────────────────────────────────
+
+class LiteracyRoadmapRecommender:
+    """
+    Model Peta Jalan Literasi berbasis Content-Based Filtering.
+
+    Fondasi: TF-IDF + cosine_similarity dari Reinalynn
+    Modifikasi: filter complexity "sedikit lebih sulit" untuk
+                menghasilkan peta jalan literasi bertahap.
+    """
+
+    def __init__(self):
+        self.df_books         = None
+        self.tfidf_vectorizer = None
+        self.tfidf_matrix     = None
+        self.cosine_sim       = None   # Reinalynn hitung full matrix — kita simpan juga
+        self.genre_index      = {}
+
+    # ── TRAINING ──────────────────────────────────────────────────
+
+    def fit(self, df: pd.DataFrame):
+        """
+        Latih model dari DataFrame buku.
+        Mengikuti alur notebook Reinalynn:
+          ds['full_text'] → TfidfVectorizer → cosine_similarity matrix
+        """
+        print("[MODEL] Memulai training...")
+        setup_nltk()
+
+        self.df_books = df.copy().reset_index(drop=True)
+        self.df_books["complexity_score"] = (
+            self.df_books["complexity_score"].fillna(50.0).astype(float)
+        )
+
+        # ── Step 1: Bangun full_text (analog kolom Reinalynn) ────
+        print("[MODEL] Membangun full_text (genre × 3 + summary)...")
+        self.df_books["full_text"] = self.df_books.apply(build_full_text, axis=1)
+
+        # ── Step 2: Bersihkan teks per bahasa ───────────────────
+        # Reinalynn mendefinisikan clean_txt() tapi memilih skip.
+        # Kita tetap pakai karena dataset campuran ID+EN perlu normalisasi.
+        # Stopword dipilih per buku sesuai kolom "language" agar
+        # kata seperti "di" tidak ikut dibuang dari teks bahasa Inggris.
+        # Tambahkan parameter axis=1 dan panggil row["language"]
+        self.df_books["full_text_clean"] = self.df_books.apply(
+            lambda row: clean_txt(row["full_text"], row["language"]),
+            axis=1
+        )
+
+        # ── Step 3: TF-IDF Vectorizer ────────────────────────────
+        # Persis dari notebook Reinalynn:
+        #   TfidfVectorizer()
+        #   tfidf_matrix = tfidf.fit_transform(ds['full_text'])
+        # Kita tambah max_features dan ngram_range agar ringan di CPU
+        print("[MODEL] Fitting TF-IDF Vectorizer...")
+        self.tfidf_vectorizer = TfidfVectorizer(
+            max_features=8000,     # Reinalynn tidak batasi (dataset-nya 10k buku)
+            ngram_range=(1, 2),    # unigram + bigram, lebih kaya dari pure unigram
+            min_df=1,
+            lowercase=True,
+            strip_accents="unicode",
+        )
+        self.tfidf_matrix = self.tfidf_vectorizer.fit_transform(
+            self.df_books["full_text_clean"]
+        )
+        print(f"         TF-IDF matrix: {self.tfidf_matrix.shape}")
+
+        # ── Step 4: Cosine Similarity Matrix ─────────────────────
+        # Persis dari Reinalynn:
+        #   cosine_sim = cosine_similarity(tfidf_matrix, tfidf_matrix)
+        # Catatan: untuk dataset besar ini bisa berat di RAM.
+        # Kita simpan full matrix hanya jika < 3000 buku,
+        # sisanya hitung on-demand saat query.
+        n_books = len(self.df_books)
+        if n_books <= 3000:
+            print("[MODEL] Menghitung cosine similarity matrix (full)...")
+            self.cosine_sim = cosine_similarity(self.tfidf_matrix, self.tfidf_matrix)
+            print(f"         Cosine sim matrix: {self.cosine_sim.shape}")
+        else:
+            print(f"[MODEL] Dataset besar ({n_books} buku) → cosine similarity on-demand")
+            self.cosine_sim = None
+
+        # ── Step 5: Genre Index ───────────────────────────────────
+        print("[MODEL] Membangun genre index...")
+        for idx, row in self.df_books.iterrows():
+            for g in str(row["genre"]).split("|"):
+                g = g.strip().lower()
+                if g:
+                    self.genre_index.setdefault(g, []).append(idx)
+
+        print(f"         Genre unik: {len(self.genre_index)}")
+        print("[MODEL] Training selesai ✓")
+        return self
+
+    # ── INFERENSI ─────────────────────────────────────────────────
+
+    def _get_book_idx(self, title: str) -> int:
+        """Cari index buku berdasarkan judul (partial match, case-insensitive)."""
+        mask = self.df_books["title"].str.lower().str.contains(
+            title.lower().strip(), na=False
+        )
+        matches = self.df_books[mask]
+        if matches.empty:
+            raise ValueError(f"Buku '{title}' tidak ditemukan dalam dataset.")
+        return matches.index[0]
+
+    def _get_similarity_scores(self, source_idx: int, candidate_indices: list) -> np.ndarray:
+        """
+        Hitung cosine similarity antara buku sumber dan kandidat.
+        Jika full matrix sudah dihitung (Reinalynn style), pakai itu.
+        Jika tidak, hitung on-demand untuk kandidat saja (hemat RAM).
+        """
+        if self.cosine_sim is not None:
+            # Reinalynn: cosine_sim[idx] → similarity semua buku dengan buku idx
+            return self.cosine_sim[source_idx][candidate_indices]
+        else:
+            # On-demand: hitung hanya untuk kandidat
+            source_vec    = self.tfidf_matrix[source_idx]
+            candidate_mat = self.tfidf_matrix[candidate_indices]
+            return cosine_similarity(source_vec, candidate_mat)[0]
+
+    def _get_candidates(self, source_idx: int, complexity_score: float) -> list:
+        """
+        Modifikasi utama dari logika Reinalynn:
+        Reinalynn: ambil semua buku, rank by similarity, return top-N
+        Kita      : filter genre overlap + complexity zone, BARU rank by similarity
+
+        Zona complexity: [score + MIN_DELTA, score + MAX_DELTA]
+        """
+        source_genres = {
+            g.strip().lower()
+            for g in str(self.df_books.loc[source_idx, "genre"]).split("|")
+        }
+
+        # Kumpulkan kandidat bergenre overlap
+        genre_candidates = set()
+        for g in source_genres:
+            genre_candidates.update(self.genre_index.get(g, []))
+        genre_candidates.discard(source_idx)
+
+        # Filter complexity zone
+        lo = complexity_score + COMPLEXITY_MIN_DELTA
+        hi = complexity_score + COMPLEXITY_MAX_DELTA
+        primary = [
+            i for i in genre_candidates
+            if lo <= self.df_books.loc[i, "complexity_score"] <= hi
+        ]
+
+        # Fallback: perlebar zona jika kurang dari 3 kandidat
+        if len(primary) < 3:
+            lo_fb, hi_fb = complexity_score + 1, complexity_score + 25
+            fallback = [
+                i for i in genre_candidates
+                if lo_fb <= self.df_books.loc[i, "complexity_score"] <= hi_fb
+                and i not in primary
+            ]
+            primary += fallback
+
+        return primary
+
+    def recommend(self, book_title: str, top_n: int = TOP_N_DEFAULT) -> list:
+        """
+        Rekomendasikan buku berikutnya di peta jalan literasi.
+
+        Alur (modifikasi dari Reinalynn):
+          1. Cari index buku sumber (sama dengan Reinalynn)
+          2. Filter kandidat: genre overlap + complexity zone   ← BARU
+          3. Hitung cosine_similarity untuk kandidat saja       ← dioptimasi
+          4. Return top_n terurut by similarity                 ← sama
+
+        Reinalynn langsung ke step 3 tanpa filter,
+        sehingga buku yang paling mirip bisa saja level yang sama.
+        """
+        if self.df_books is None:
+            raise RuntimeError("Model belum dilatih. Panggil fit() terlebih dahulu.")
+
+        source_idx   = self._get_book_idx(book_title)
+        source_row   = self.df_books.loc[source_idx]
+        source_score = float(source_row["complexity_score"])
+
+        candidates = self._get_candidates(source_idx, source_score)
+        if not candidates:
+            return []
+
+        sims   = self._get_similarity_scores(source_idx, candidates)
+        ranked = sorted(zip(candidates, sims), key=lambda x: x[1], reverse=True)
+
+        return [
+            self._format_book(self.df_books.loc[idx], sim, source_score)
+            for idx, sim in ranked[:top_n]
+        ]
+
+    def get_roadmap(self, read_books: list, top_n: int = TOP_N_DEFAULT) -> dict:
+        """Buat peta jalan dari daftar buku yang sudah dibaca."""
+        source_data, all_recs, scores = [], [], []
+
+        for title in read_books:
+            try:
+                idx   = self._get_book_idx(title)
+                row   = self.df_books.loc[idx]
+                recs  = self.recommend(title, top_n=top_n)
+
+                source_data.append(self._format_book(row))
+                all_recs.extend(recs)
+                scores.append(float(row["complexity_score"]))
+            except ValueError as e:
+                print(f"[WARN] {e}")
+
+        if not scores:
+            return {"error": "Tidak ada buku yang ditemukan."}
+
+        current_level = round(float(np.mean(scores)), 1)
+
+        # Deduplikasi, prioritas similarity tertinggi
+        seen, unique_recs = set(), []
+        for rec in sorted(all_recs, key=lambda x: x["similarity_score"], reverse=True):
+            if rec["book_id"] not in seen:
+                seen.add(rec["book_id"])
+                unique_recs.append(rec)
+
+        return {
+            "current_level":   current_level,
+            "current_label":   get_complexity_label(current_level),
+            "target_range": {
+                "min": round(current_level + COMPLEXITY_MIN_DELTA, 1),
+                "max": round(current_level + COMPLEXITY_MAX_DELTA, 1),
+            },
+            "source_books":    source_data,
+            "recommendations": unique_recs[:top_n * 2],
+        }
+
+    def _format_book(self, row, similarity_score=None, source_score=None) -> dict:
+        """
+        Format satu buku menjadi dict JSON-ready.
+        Nama field ini adalah KONTRAK dengan frontend — jangan diubah
+        tanpa update dokumentasi di step4_api.py.
+        """
+        c_score = float(row.get("complexity_score", 50))
+        genres  = [g.strip() for g in str(row.get("genre", "")).split("|") if g.strip()]
+        summary = str(row.get("summary", ""))
+        delta   = round(c_score - source_score, 1) if source_score is not None else None
+
+        return {
+            "book_id":          int(row.get("book_id", 0)),
+            "title":            str(row.get("title", "")),
+            "author":           str(row.get("author", "")),
+            "genre":            str(row.get("genre", "")),
+            "genre_list":       genres,
+            "language":         str(row.get("language", "en")),
+            "summary":          summary,
+            "summary_short":    summary[:150] + "..." if len(summary) > 150 else summary,
+            "complexity_score": round(c_score, 1),
+            "complexity_label": get_complexity_label(c_score),
+            "complexity_delta": delta,
+            "similarity_score": round(float(similarity_score), 3) if similarity_score is not None else None,
+            "roadmap_step":     f"Langkah berikutnya (+{delta:.0f} poin)" if delta is not None else None,
+        }
+
+
+def get_complexity_label(score: float) -> str:
+    if score <= 20:   return "Sangat Mudah"
+    elif score <= 40: return "Mudah"
+    elif score <= 60: return "Menengah"
+    elif score <= 80: return "Sulit"
+    else:             return "Sangat Sulit"
+
+
+# ─── PIPELINE ───────────────────────────────────────────────────
+
+def training_pipeline():
+    print("\n" + "="*60)
+    print("  PETA JALAN LITERASI - STEP 3: TRAINING MODEL")
+    print("  Diadaptasi dari: Reinalynn/Building-a-Book-Recommendation")
+    print("  Modifikasi: genre filter + complexity heuristic")
+    print("="*60)
+
+    if not os.path.exists(SCORED_FILE):
+        print(f"[ERROR] {SCORED_FILE} tidak ditemukan.")
+        print("        Jalankan step2_complexity.py terlebih dahulu!")
+        return None
+
+    df = pd.read_csv(SCORED_FILE, encoding="utf-8-sig")
+    print(f"[OK] Loaded {len(df)} buku")
+
+    os.makedirs(MODEL_DIR, exist_ok=True)
+
+    model = LiteracyRoadmapRecommender()
+    model.fit(df)
+
+    # Simpan model
+    with open(MODEL_FILE, "wb") as f:
+        pickle.dump(model, f)
+    print(f"\n[SUKSES] Model disimpan: {MODEL_FILE}")
+
+    # ── TEST ─────────────────────────────────────────────────────
+    print("\n--- TEST REKOMENDASI ---")
+    for title in ["Laskar Pelangi", "Harry Potter", "To Kill a Mockingbird"]:
+        try:
+            src_idx   = model._get_book_idx(title)
+            src_score = model.df_books.loc[src_idx, "complexity_score"]
+            recs      = model.recommend(title, top_n=3)
+            print(f"\n'{title}' (skor={src_score:.1f}) →")
+            if recs:
+                for i, r in enumerate(recs, 1):
+                    print(f"  {i}. {r['title'][:45]:<45} "
+                          f"[{r['language']}] "
+                          f"skor={r['complexity_score']:.1f} "
+                          f"delta={r['complexity_delta']:+.1f} "
+                          f"sim={r['similarity_score']:.3f}")
+            else:
+                print("     (tidak ada rekomendasi — perlu dataset lebih besar)")
+        except ValueError as e:
+            print(f"  [SKIP] {e}")
+
+    print("\n→ Lanjutkan ke step4_api.py")
+    return model
+
+
+if __name__ == "__main__":
+    model = training_pipeline()
+  
+File step4_api.py
+"""
+=================================================================
+PETA JALAN LITERASI - STEP 4: REST API (Flask)
+=================================================================
+Endpoint yang tersedia:
+
+  GET  /api/health
+       → Status server + jumlah buku dalam dataset
+
+  GET  /api/books/search?q=<query>&lang=<id|en|all>
+       → Cari buku berdasarkan judul/penulis
+
+  GET  /api/books/<book_id>
+       → Detail satu buku berdasarkan ID
+
+  POST /api/recommend
+       Body JSON: { "book_title": "Laskar Pelangi", "top_n": 5 }
+       → Rekomendasi untuk satu buku
+
+  POST /api/roadmap
+       Body JSON: {
+         "read_books": ["Laskar Pelangi", "Perahu Kertas"],
+         "top_n": 5
+       }
+       → Peta jalan lengkap dari daftar buku yang sudah dibaca
+
+─────────────────────────────────────────────────────────────────
+KONTRAK JSON RESPONSE (untuk integrasi frontend):
+Semua response sukses menggunakan format:
+  {
+    "status": "success",
+    "data": { ... }       ← Payload utama
+  }
+Semua error menggunakan format:
+  {
+    "status": "error",
+    "message": "..."
+  }
+─────────────────────────────────────────────────────────────────
+
+Jalankan: python step4_api.py
+Akses di : http://localhost:5000
+=================================================================
+"""
+
+import os
+import pickle
+import json
+from flask import Flask, request, jsonify
+from flask_cors import CORS
+
+# WAJIB: import class model agar pickle bisa menemukan definisinya saat load.
+# Tanpa ini pickle.load() akan throw AttributeError: Can't get attribute
+# 'LiteracyRoadmapRecommender' karena class-nya tidak dikenal di namespace ini.
+from step3_train_recommender import LiteracyRoadmapRecommender, get_complexity_label
+
+# ─── KONFIGURASI ────────────────────────────────────────────────
+MODEL_FILE = os.path.join("data", "model", "recommender.pkl")
+PORT       = 5000
+DEBUG      = True    # Set False untuk production
+
+# ─── INISIALISASI FLASK ─────────────────────────────────────────
+app = Flask(__name__)
+CORS(app)    # Izinkan request dari frontend (cross-origin)
+
+# ─── LOAD MODEL ─────────────────────────────────────────────────
+model = None
+
+def load_model():
+    """Load model dari file pickle."""
+    global model
+    if not os.path.exists(MODEL_FILE):
+        print(f"[ERROR] Model tidak ditemukan: {MODEL_FILE}")
+        print("        Jalankan step3_train_recommender.py terlebih dahulu!")
+        return False
+    with open(MODEL_FILE, "rb") as f:
+        model = pickle.load(f)
+    print(f"[OK] Model loaded. Dataset: {len(model.df_books)} buku")
+    return True
+
+
+# ─── HELPER ─────────────────────────────────────────────────────
+
+def success_response(data: dict, status_code: int = 200):
+    """Format response sukses yang konsisten."""
+    return jsonify({"status": "success", "data": data}), status_code
+
+
+def error_response(message: str, status_code: int = 400):
+    """Format response error yang konsisten."""
+    return jsonify({"status": "error", "message": message}), status_code
+
+
+def check_model():
+    """Pastikan model sudah dimuat sebelum handle request."""
+    if model is None:
+        return error_response("Model belum dimuat. Jalankan training terlebih dahulu.", 503)
+    return None
+
+
+# ─── ENDPOINT: HEALTH CHECK ─────────────────────────────────────
+
+@app.route("/api/health", methods=["GET"])
+def health():
+    """
+    GET /api/health
+
+    Response JSON:
+    {
+      "status": "success",
+      "data": {
+        "service":      (str)  Nama layanan
+        "model_loaded": (bool) Apakah model tersedia
+        "total_books":  (int)  Jumlah buku dalam dataset
+        "genres":       (list) Daftar genre yang tersedia
+        "languages":    (list) ["id", "en"]
+      }
+    }
+    """
+    if model is None:
+        return success_response({
+            "service":      "Peta Jalan Literasi API",
+            "model_loaded": False,
+            "total_books":  0,
+            "genres":       [],
+            "languages":    [],
+        })
+
+    # Kumpulkan genre unik
+    all_genres = set()
+    for g_str in model.df_books["genre"].fillna(""):
+        for g in g_str.split("|"):
+            g = g.strip()
+            if g:
+                all_genres.add(g)
+
+    return success_response({
+        "service":      "Peta Jalan Literasi API",
+        "model_loaded": True,
+        "total_books":  len(model.df_books),
+        "genres":       sorted(list(all_genres))[:50],   # Batasi 50 genre teratas
+        "languages":    ["id", "en"],
+    })
+
+
+# ─── ENDPOINT: CARI BUKU ────────────────────────────────────────
+
+@app.route("/api/books/search", methods=["GET"])
+def search_books():
+    """
+    GET /api/books/search?q=<query>&lang=<id|en|all>&limit=<int>
+
+    Query params:
+      q     (str, required) : Kata kunci judul atau penulis
+      lang  (str, optional) : Filter bahasa "id", "en", atau "all" (default)
+      limit (int, optional) : Jumlah hasil maksimal (default: 10)
+
+    Response JSON:
+    {
+      "status": "success",
+      "data": {
+        "query":       (str)  Query yang digunakan
+        "total_found": (int)  Jumlah hasil
+        "books": [
+          {
+            "book_id":          (int)   ID unik buku
+            "title":            (str)   Judul buku
+            "author":           (str)   Nama penulis
+            "genre":            (str)   Genre dengan separator "|"
+            "genre_list":       (list)  Genre dalam bentuk array
+            "language":         (str)   "id" atau "en"
+            "summary_short":    (str)   150 karakter pertama sinopsis
+            "complexity_score": (float) Skor 0-100
+            "complexity_label": (str)   "Mudah", "Menengah", dll
+            "complexity_delta": null    (null untuk search result)
+            "similarity_score": null    (null untuk search result)
+            "roadmap_step":     null    (null untuk search result)
+          },
+          ...
+        ]
+      }
+    }
+    """
+    err = check_model()
+    if err:
+        return err
+
+    q     = request.args.get("q", "").strip()
+    lang  = request.args.get("lang", "all").strip().lower()
+    limit = int(request.args.get("limit", 10))
+
+    if not q:
+        return error_response("Parameter 'q' (query) wajib diisi.")
+
+    df = model.df_books.copy()
+
+    # Filter bahasa
+    if lang in ("id", "en"):
+        df = df[df["language"] == lang]
+
+    # Cari di judul dan penulis (case-insensitive)
+    mask = (
+        df["title"].str.lower().str.contains(q.lower(), na=False) |
+        df["author"].str.lower().str.contains(q.lower(), na=False)
+    )
+    results = df[mask].head(limit)
+
+    books = [model._format_book(row) for _, row in results.iterrows()]
+
+    return success_response({
+        "query":       q,
+        "total_found": len(books),
+        "books":       books,
+    })
+
+
+# ─── ENDPOINT: DETAIL BUKU ──────────────────────────────────────
+
+@app.route("/api/books/<int:book_id>", methods=["GET"])
+def get_book(book_id: int):
+    """
+    GET /api/books/<book_id>
+
+    Berbeda dari endpoint search: endpoint ini mengembalikan
+    sinopsis PENUH (bukan summary_short 150 karakter) karena
+    dipakai untuk halaman/modal detail buku yang memang
+    dimaksudkan agar pengguna bisa membaca seluruh sinopsis.
+
+    Response JSON:
+    {
+      "status": "success",
+      "data": {
+        "book": {
+          ...semua field _format_book()...
+          "summary_full": (str)  ← sinopsis lengkap tanpa dipotong
+        }
+      }
+    }
+    """
+    err = check_model()
+    if err:
+        return err
+
+    matches = model.df_books[model.df_books["book_id"] == book_id]
+    if len(matches) == 0:
+        return error_response(f"Buku dengan ID {book_id} tidak ditemukan.", 404)
+
+    row  = matches.iloc[0]
+    book = model._format_book(row)
+
+    # Tambahkan sinopsis penuh — _format_book() hanya simpan 150 karakter
+    # di summary_short untuk efisiensi response search/roadmap.
+    # Untuk detail view, kita kirim teks lengkapnya.
+    book["summary_full"] = str(row.get("summary", "")).strip()
+
+    return success_response({"book": book})
+
+
+# ─── ENDPOINT: REKOMENDASI SATU BUKU ────────────────────────────
+
+@app.route("/api/recommend", methods=["POST"])
+def recommend():
+    """
+    POST /api/recommend
+
+    Request Body JSON:
+    {
+      "book_title": (str, required) Judul buku yang sudah dibaca
+      "top_n":      (int, optional) Jumlah rekomendasi, default 5
+    }
+
+    Response JSON:
+    {
+      "status": "success",
+      "data": {
+        "source_book": {
+          "book_id":          (int)
+          "title":            (str)
+          "author":           (str)
+          "genre":            (str)
+          "genre_list":       (list)
+          "language":         (str)
+          "summary_short":    (str)
+          "complexity_score": (float)
+          "complexity_label": (str)
+          "complexity_delta": null
+          "similarity_score": null
+          "roadmap_step":     null
+        },
+        "recommendations": [
+          {
+            "book_id":          (int)
+            "title":            (str)
+            "author":           (str)
+            "genre":            (str)
+            "genre_list":       (list)   ← Digunakan untuk render tag di UI
+            "language":         (str)    ← "id"/"en" untuk badge bahasa
+            "summary_short":    (str)    ← Teks preview kartu buku
+            "complexity_score": (float)  ← Tampilkan sebagai progress bar
+            "complexity_label": (str)    ← Badge warna berdasarkan label
+            "complexity_delta": (float)  ← "+7.3" → tampilkan sebagai "+7 poin"
+            "similarity_score": (float)  ← 0–1, untuk sorting/display
+            "roadmap_step":     (str)    ← Teks deskriptif langkah peta jalan
+          },
+          ...
+        ],
+        "next_target_range": {
+          "min": (float)   ← Skor minimum zona target
+          "max": (float)   ← Skor maksimum zona target
+        }
+      }
+    }
+    """
+    err = check_model()
+    if err:
+        return err
+
+    body = request.get_json(silent=True) or {}
+    book_title = body.get("book_title", "").strip()
+    top_n      = int(body.get("top_n", 5))
+
+    if not book_title:
+        return error_response("Field 'book_title' wajib diisi.")
+
+    if top_n < 1 or top_n > 20:
+        return error_response("top_n harus antara 1 sampai 20.")
+
+    try:
+        source_idx  = model._get_book_idx(book_title)
+        source_row  = model.df_books.loc[source_idx]
+        source_book = model._format_book(source_row)
+        source_score = float(source_row["complexity_score"])
+
+        recommendations = model.recommend(book_title, top_n=top_n)
+
+        return success_response({
+            "source_book":       source_book,
+            "recommendations":   recommendations,
+            "next_target_range": {
+                "min": round(source_score + 3, 1),
+                "max": round(source_score + 15, 1),
+            },
+        })
+
+    except ValueError as e:
+        return error_response(str(e), 404)
+    except Exception as e:
+        return error_response(f"Error internal: {str(e)}", 500)
+
+
+# ─── ENDPOINT: PETA JALAN LENGKAP ───────────────────────────────
+
+@app.route("/api/roadmap", methods=["POST"])
+def roadmap():
+    """
+    POST /api/roadmap
+
+    Request Body JSON:
+    {
+      "read_books": (list, required) Daftar judul buku yang sudah dibaca
+                    Contoh: ["Laskar Pelangi", "Perahu Kertas"]
+      "top_n":      (int, optional)  Jumlah rekomendasi, default 5
+    }
+
+    Response JSON:
+    {
+      "status": "success",
+      "data": {
+        "current_level":  (float)  Rata-rata complexity buku yang dibaca
+        "current_label":  (str)    Label level saat ini
+        "target_range": {
+          "min": (float),           ← Batas bawah zona target
+          "max": (float)            ← Batas atas zona target
+        },
+        "source_books": [           ← Buku yang sudah dibaca (verified)
+          { ... }                   ← Format _format_book()
+        ],
+        "recommendations": [        ← Rekomendasi buku berikutnya
+          {
+            "book_id":          (int)
+            "title":            (str)
+            "author":           (str)
+            "genre":            (str)
+            "genre_list":       (list)   ← Render sebagai chip/tag di UI
+            "language":         (str)    ← Badge "ID" atau "EN"
+            "summary_short":    (str)    ← Teks preview kartu buku
+            "complexity_score": (float)  ← Progress bar 0–100
+            "complexity_label": (str)    ← Warna badge sesuai label
+            "complexity_delta": (float)  ← Tampilkan "+X poin"
+            "similarity_score": (float)  ← Tidak perlu ditampilkan ke user
+            "roadmap_step":     (str)    ← Teks tooltip/label langkah
+          },
+          ...
+        ],
+
+        // ── DATA VISUAL UNTUK "PETA PERJALANAN" ──────────────────
+        // Gunakan data ini untuk menggambar visualisasi roadmap di frontend
+        "roadmap_visualization": {
+          "nodes": [                ← Setiap node = satu buku di peta
+            {
+              "node_id":     (int)    ID unik untuk React key
+              "book_id":     (int)    Referensi ke buku
+              "title":       (str)    Label node
+              "score":       (float)  Posisi di sumbu kompleksitas
+              "label":       (str)    Label kategori
+              "type":        (str)    "read" | "recommended"
+              "step_number": (int)    Urutan di peta (1, 2, 3, ...)
+            },
+            ...
+          ],
+          "edges": [                ← Koneksi antar node
+            {
+              "from_node_id": (int)
+              "to_node_id":   (int)
+              "delta":        (float) Selisih complexity
+            },
+            ...
+          ],
+          "complexity_axis": {      ← Untuk render sumbu Y di frontend
+            "min":   0,
+            "max":   100,
+            "zones": [
+              {"label": "Sangat Mudah", "min": 0,  "max": 20,  "color": "#4CAF50"},
+              {"label": "Mudah",        "min": 20, "max": 40,  "color": "#8BC34A"},
+              {"label": "Menengah",     "min": 40, "max": 60,  "color": "#FFC107"},
+              {"label": "Sulit",        "min": 60, "max": 80,  "color": "#FF9800"},
+              {"label": "Sangat Sulit", "min": 80, "max": 100, "color": "#F44336"}
+            ]
+          }
+        }
+      }
+    }
+    """
+    err = check_model()
+    if err:
+        return err
+
+    body       = request.get_json(silent=True) or {}
+    read_books = body.get("read_books", [])
+    top_n      = int(body.get("top_n", 5))
+
+    if not read_books or not isinstance(read_books, list):
+        return error_response("Field 'read_books' harus berupa array judul buku.")
+
+    if len(read_books) > 20:
+        return error_response("Maksimal 20 buku per request.")
+
+    try:
+        result = model.get_roadmap(read_books, top_n=top_n)
+
+        if "error" in result:
+            return error_response(result["error"], 404)
+
+        # ── Bangun data visualisasi untuk frontend ──────────────
+        nodes = []
+        edges = []
+        node_counter = 1
+
+        # Node: buku yang sudah dibaca
+        read_node_ids = []
+        for book in result["source_books"]:
+            node = {
+                "node_id":     node_counter,
+                "book_id":     book["book_id"],
+                "title":       book["title"],
+                "score":       book["complexity_score"],
+                "label":       book["complexity_label"],
+                "type":        "read",
+                "step_number": node_counter,
+            }
+            nodes.append(node)
+            read_node_ids.append(node_counter)
+            node_counter += 1
+
+        # Node: buku rekomendasi
+        # Edge dihubungkan dari SEMUA buku yang sudah dibaca ke setiap rekomendasi,
+        # bukan hanya dari buku terakhir. Ini yang membuat peta jalan
+        # merepresentasikan seluruh profil bacaan pengguna, bukan satu buku saja.
+        for i, rec in enumerate(result["recommendations"]):
+            node = {
+                "node_id":     node_counter,
+                "book_id":     rec["book_id"],
+                "title":       rec["title"],
+                "score":       rec["complexity_score"],
+                "label":       rec["complexity_label"],
+                "type":        "recommended",
+                "step_number": len(result["source_books"]) + i + 1,
+            }
+            nodes.append(node)
+
+            # Sambungkan dari SETIAP buku yang dibaca ke rekomendasi ini
+            for read_node_id in read_node_ids:
+                edges.append({
+                    "from_node_id": read_node_id,
+                    "to_node_id":   node_counter,
+                    "delta":        rec["complexity_delta"],
+                })
+
+            node_counter += 1
+
+        # Zona kompleksitas untuk sumbu visualisasi
+        complexity_zones = [
+            {"label": "Sangat Mudah", "min": 0,  "max": 20,  "color": "#4CAF50"},
+            {"label": "Mudah",        "min": 20, "max": 40,  "color": "#8BC34A"},
+            {"label": "Menengah",     "min": 40, "max": 60,  "color": "#FFC107"},
+            {"label": "Sulit",        "min": 60, "max": 80,  "color": "#FF9800"},
+            {"label": "Sangat Sulit", "min": 80, "max": 100, "color": "#F44336"},
+        ]
+
+        result["roadmap_visualization"] = {
+            "nodes":            nodes,
+            "edges":            edges,
+            "complexity_axis":  {
+                "min":   0,
+                "max":   100,
+                "zones": complexity_zones,
+            },
+        }
+
+        return success_response(result)
+
+    except Exception as e:
+        return error_response(f"Error internal: {str(e)}", 500)
+
+
+# ─── ERROR HANDLERS ─────────────────────────────────────────────
+
+@app.errorhandler(404)
+def not_found(e):
+    return error_response("Endpoint tidak ditemukan.", 404)
+
+@app.errorhandler(405)
+def method_not_allowed(e):
+    return error_response("Method tidak diizinkan.", 405)
+
+@app.errorhandler(500)
+def internal_error(e):
+    return error_response("Error internal server.", 500)
+
+
+# ─── ENTRY POINT ────────────────────────────────────────────────
+if __name__ == "__main__":
+    print("\n" + "="*55)
+    print("  PETA JALAN LITERASI - STEP 4: API SERVER")
+    print("="*55)
+
+    if not load_model():
+        print("\n[INFO] Server berjalan tanpa model.")
+        print("       Jalankan step1-3 terlebih dahulu, lalu restart.")
+    else:
+        print(f"[OK] API siap di http://localhost:{PORT}")
+        print("\nEndpoint tersedia:")
+        print(f"  GET  http://localhost:{PORT}/api/health")
+        print(f"  GET  http://localhost:{PORT}/api/books/search?q=laskar")
+        print(f"  GET  http://localhost:{PORT}/api/books/1")
+        print(f"  POST http://localhost:{PORT}/api/recommend")
+        print(f"  POST http://localhost:{PORT}/api/roadmap")
+
+    app.run(host="0.0.0.0", port=PORT, debug=DEBUG)

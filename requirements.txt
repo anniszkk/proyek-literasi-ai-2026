@@ -1,0 +1,46 @@
+# ============================================================
+# PETA JALAN LITERASI - Requirements
+# Dioptimalkan untuk CPU-only, resource rendah di VSCode
+# ============================================================
+
+# ── LFTK (brucewlee/lftk) + spaCy ─────────────────────────────
+# Dipakai untuk buku bahasa INGGRIS di step2_complexity.py
+lftk>=1.0.9
+spacy>=3.5.0,<4.0.0
+
+# Model spaCy untuk bahasa Inggris (install setelah pip install spacy):
+#   python -m spacy download en_core_web_sm
+# Model ini ~12MB, ringan, cukup untuk fitur surface + readformula
+
+# ── NLP Tambahan (untuk buku bahasa Indonesia) ─────────────────
+textstat>=0.7.3       # Readability scores (Flesch, Gunning Fog)
+nltk>=3.8.1           # Tokenisasi, stopwords
+selenium>=4.15.0      # WebDriver manager for browser automation
+webdriver-manager>=0.15.0 # Manajemen driver untuk Selenium (otomatis download driver yang cocok)
+
+# ── Data & Numerik ─────────────────────────────────────────────
+numpy>=1.24.0
+pandas>=2.0.0
+
+# ── Rekomendasi (step3) ────────────────────────────────────────
+scikit-learn>=1.3.0   # TF-IDF + cosine similarity, ringan di CPU
+PySastrawi>=1.2.0   # Stemmer bahasa Indonesia, ringan di CPU
+
+# ── API Backend (step4) ────────────────────────────────────────
+flask>=3.0.0
+flask-cors>=4.0.0
+
+# ── Utility ────────────────────────────────────────────────────
+requests>=2.31.0      # Download dataset CMU
+python-dotenv>=1.0.0
+tqdm>=4.66.0
+
+# ── TIDAK dipakai (terlalu berat untuk CPU) ────────────────────
+# torch, tensorflow, transformers, sentence-transformers
+# xx_sent_ud_sm (model spaCy multilingual — tidak dibutuhkan di Opsi A)
+
+# ── URUTAN INSTALL YANG DISARANKAN ────────────────────────────
+# 1. pip install -r requirements.txt
+# 2. python -m spacy download en_core_web_sm
+# 3. python -c "import nltk; nltk.download('punkt_tab'); nltk.download('stopwords'); nltk.download('averaged_perceptron_tagger_eng')"
+# 4. python run_all.py
